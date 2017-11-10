@@ -1,0 +1,31 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace ECS {
+	
+	 /// <summary>
+    /// Required Components: MyComponent
+    /// </summary>
+	//use this tag to group systems for debugging purposes
+	//[DebugSystemGroup("MyGroup")] 
+	public class #SCRIPTNAME# : ComponentSystem {
+		
+		// this will inject all entities with components of type MyComponent 
+		// if you define multiple ComponentArrays with the [InjectTuple] tag
+		// you will only receive those entities with both Components
+		//[InjectTuple]
+		//ComponentArray<MyComponent> myComponent;		
+		
+		
+		// Use this for standard unity start function
+		public override void OnStart(){
+		
+		}
+		
+		// Use this for standard unity update function
+		public override void OnUpdate(){
+		
+		}
+	}
+}

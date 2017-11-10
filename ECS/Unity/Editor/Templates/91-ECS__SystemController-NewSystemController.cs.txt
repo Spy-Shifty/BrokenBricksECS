@@ -1,0 +1,30 @@
+﻿using UnityEngine;
+
+namespace ECS {
+		
+    // Use this class instead of the UnityStandardSystemRoot to create decoupled systems
+    // you also have to create a custom EntityManager, because of the Injectionmanager that handles all EntityManagers as singletons
+    //[InjectableDependency(LifeTime.Singleton)]
+    //public class MyEntityManager : EntityManager { }
+    //[InjectableDependency(LifeTime.PerInstance)]
+    //class MySystemRoot : UnitySystemRoot<MyEntityManager> {}
+	
+	// Use this class to control the ECS System
+	// for different context replace ECSController<UnityStandardSystemRoot, EntityManager>  with your context classes
+	public class #SCRIPTNAME# : ECSController<UnityStandardSystemRoot, EntityManager> {
+	
+		// Use this for initialization
+		protected override void Initialize() {
+			// You can eighver use this convention to add a system to the systemRoot
+			//AddSystem<MySystem>();
+			
+			// or you can use this for more controll over compositions of systems
+			//AddSystem(new MySystem());
+		}
+
+		// Override this method if not all GameObjectEntities in the scene should be in the context of this system
+		// protected override void AddSceneEntitiesToSystem() {
+            
+        //}
+	}
+}
