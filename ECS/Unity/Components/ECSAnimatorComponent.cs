@@ -16,7 +16,7 @@ namespace ECS {
     }
 
     // this wrapps the component tfor Scene & Prefab workflow
-    [HideInInspector]
+    //[HideInInspector]
     [RequireComponent(typeof(Animator))]
     public class ECSAnimatorComponent : ComponentWrapper<ECSAnimator> {
         public override void Initialize() {

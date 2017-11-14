@@ -14,6 +14,8 @@ public class GameObjectEntity : MonoBehaviour {
     private Dictionary<Type, ComponentWrapper> _componentWrapperMap = new Dictionary<Type, ComponentWrapper>();
 
     public bool IsInitialized { get; private set; }
+    public Entity Entity { get { return _entity; } }
+    public EntityManager EntityManager { get { return _entityManager; } }
 
     public void SetEntity(Entity entity, EntityManager entityManager) {
         if (IsInitialized) {

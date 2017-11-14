@@ -5,7 +5,7 @@ namespace ECSExample.Beginner {
     class UpdateFloatSystem : ComponentSystem {
 
         [InjectDependency]
-        private EntityManager entityManager;
+        private UnityEntityManager entityManager;
         
         [InjectTuple]
         private ComponentArray<FloatComponent> floats;

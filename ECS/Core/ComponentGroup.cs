@@ -86,9 +86,9 @@ namespace ECS {
 
         public static int GenerateHash(params Type[] types) {
             unchecked {
-                int hash = 0;
+                int hash = 5381;
                 foreach (var type in types) {
-                    hash |= type.GetHashCode();
+                    hash = hash * 33 + type.GetHashCode();
                 }
                 return hash;
             }
@@ -136,7 +136,7 @@ namespace ECS {
 
     public sealed class ComponentArray<TComponent> : ComponentArray, /*IComponentArray,*/ IEnumerable<TComponent> where TComponent : IComponent {
 
-        private const int StartSize = 10;
+        private const int StartSize = 8;
         private const int ResizeFactor = 2;
         private readonly Dictionary<Entity, int> _componentsMap = new Dictionary<Entity, int>();
 
@@ -183,6 +183,16 @@ namespace ECS {
                 _componentsMap[_entities[index]] = index;
                 _componentsMap.Remove(entity);
                 size--;
+
+                int shrinkSize = _components.Length / (2 * ResizeFactor);
+                if (size <= shrinkSize && shrinkSize > StartSize) {
+                    var newEntityArray = new Entity[_entities.Length / ResizeFactor];
+                    var newComponentArray = new TComponent[_components.Length / ResizeFactor];
+                    Array.Copy(_entities, newEntityArray, size);
+                    Array.Copy(_components, newComponentArray, size);
+                    _entities = newEntityArray;
+                    _components = newComponentArray;
+                }
             }            
         }
 

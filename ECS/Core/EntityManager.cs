@@ -9,16 +9,19 @@ namespace ECS {
 
     [InjectableDependency(LifeTime.Singleton)]
     public class EntityManager {
+        public EntityManager() {
+
+        }
 
         private readonly static Type iComponentType = typeof(IComponent);
 
         private int nextEntityId = 0;
         private readonly Stack<int> freeEntityIds = new Stack<int>();
         
-        private readonly List<Entity> _entities = new List<Entity>();
-        private readonly Dictionary<Entity, HashSet<Type>> _entityComponents = new Dictionary<Entity, HashSet<Type>>();
-        private readonly Dictionary<Type, ComponentArray> _components = new Dictionary<Type, ComponentArray>(TypeComparer.typeComparer);
-        private readonly Dictionary<GroupMatcher, ComponentGroup> componentGroups = new Dictionary<GroupMatcher, ComponentGroup>();
+        protected readonly List<Entity> _entities = new List<Entity>();
+        protected readonly Dictionary<Entity, HashSet<Type>> _entityComponents = new Dictionary<Entity, HashSet<Type>>();
+        protected readonly Dictionary<Type, ComponentArray> _components = new Dictionary<Type, ComponentArray>(TypeComparer.typeComparer);
+        protected readonly Dictionary<GroupMatcher, ComponentGroup> componentGroups = new Dictionary<GroupMatcher, ComponentGroup>();
 
         public event Action<Entity> EntityCreated;
         public event Action<Entity> EntityDestroyed;
@@ -32,11 +35,11 @@ namespace ECS {
         //[Obsolete("Garbage Collection intensive operation! Boxing of structure type components! Only for debugging purpose!!! Dont use this in operative System!")]
         public event Action<Entity, Type> CompoentChanged;
         
-        List<Entity> _entityCreatedList = new List<Entity>();
-        List<Entity> _entityDestroyedList = new List<Entity>();
-        List<KeyValuePair<Entity, Type>> _compoentAddedList = new List<KeyValuePair<Entity, Type>>();
-        List<KeyValuePair<Entity, Type>> _compoentRemovedList = new List<KeyValuePair<Entity, Type>>();
-        List<KeyValuePair<Entity, Type>> _compoentChangedList = new List<KeyValuePair<Entity, Type>>();
+        private List<Entity> _entityCreatedList = new List<Entity>();
+        private List<Entity> _entityDestroyedList = new List<Entity>();
+        private List<KeyValuePair<Entity, Type>> _compoentAddedList = new List<KeyValuePair<Entity, Type>>();
+        private List<KeyValuePair<Entity, Type>> _compoentRemovedList = new List<KeyValuePair<Entity, Type>>();
+        private List<KeyValuePair<Entity, Type>> _compoentChangedList = new List<KeyValuePair<Entity, Type>>();
 
         public void ProcessMessageQueue() {
             if (EntityCreated != null) {

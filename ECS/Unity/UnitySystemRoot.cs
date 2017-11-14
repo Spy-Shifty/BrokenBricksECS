@@ -11,16 +11,16 @@ namespace ECS {
 
 #if !(UNITY_EDITOR && ECS_DEBUG)
     [InjectableDependency(LifeTime.PerInstance)]
-    public class UnityStandardSystemRoot : SystemRoot<EntityManager> { }
+    public class UnityStandardSystemRoot : UnitySystemRoot<UnityEntityManager>  { }
 
-    public class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : EntityManager {
+    public class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
     }
 #else
     [InjectableDependency(LifeTime.PerInstance)]
-    public class UnityStandardSystemRoot : UnitySystemRoot<EntityManager> { }
+    public class UnityStandardSystemRoot : UnitySystemRoot<UnityEntityManager> { }
 
     [InjectableDependency(LifeTime.PerInstance)]
-    public class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : EntityManager {
+    public class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
         
         private readonly Dictionary<string, DebugSystems> _componentSystemList = new Dictionary<string, DebugSystems>();
 
@@ -82,13 +82,16 @@ namespace ECS {
 
         public override void Start() {
             _rootDebugSystems.OnStart();
+            _entityManager.ProcessMessageQueue();
         }
         public override void Update() {
             _rootDebugSystems.OnUpdate();
+            _entityManager.ProcessMessageQueue();
         }
 
         public override void FixedUpdate() {
             _rootDebugSystems.OnFixedUpdate();
+            _entityManager.ProcessMessageQueue();
         }
     }
 #endif

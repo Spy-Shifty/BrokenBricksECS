@@ -9,7 +9,7 @@ namespace ECSExample.Beginner {
         private GameObject _gameObject;
 
         [InjectDependency]
-        private EntityManager entityManager;
+        private UnityEntityManager entityManager;
 
         public override void OnStart() {
             _gameObject = new GameObject("Entities");

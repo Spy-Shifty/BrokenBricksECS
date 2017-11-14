@@ -14,7 +14,7 @@ namespace ECS {
         private readonly List<ComponentSystem> _fixedUpdateSystemList = new List<ComponentSystem>();
 
         [InjectDependency]
-        private TEntityManager _entityManager;
+        protected TEntityManager _entityManager;
 
         public SystemRoot() {
             InjectionManager.ResolveDependency(this);
