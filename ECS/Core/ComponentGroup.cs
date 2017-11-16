@@ -62,7 +62,7 @@ namespace ECS {
             }
 
             if (OnEntityRemoved != null) {
-                OnEntityAdded.Invoke(entity);
+                OnEntityRemoved.Invoke(entity);
             }
         }
 
