@@ -13,116 +13,130 @@ namespace ECS {
 
         }
 
-        private readonly static Type iComponentType = typeof(IComponent);
+        private readonly static Type _iComponentType = typeof(IComponent);
 
-        private int nextEntityId = 0;
-        private readonly Stack<int> freeEntityIds = new Stack<int>();
+        private int _nextEntityId = 0;
+        private readonly Stack<int> _freeEntityIds = new Stack<int>();
         
         protected readonly List<Entity> _entities = new List<Entity>();
         protected readonly Dictionary<Entity, HashSet<Type>> _entityComponents = new Dictionary<Entity, HashSet<Type>>();
         protected readonly Dictionary<Type, ComponentArray> _components = new Dictionary<Type, ComponentArray>(TypeComparer.typeComparer);
         protected readonly Dictionary<GroupMatcher, ComponentGroup> componentGroups = new Dictionary<GroupMatcher, ComponentGroup>();
 
-        public event Action<Entity> EntityCreated;
-        public event Action<Entity> EntityDestroyed;
+        //public event Action<Entity> EntityCreated;
+        //public event Action<Entity> EntityDestroyed;
 
         //[Obsolete("Garbage Collection intensive operation! Boxing of structure type components! Only for debugging purpose!!! Dont use this in operative System!")]
-        public event Action<Entity, Type> CompoentAdded;
+        //public event Action<Entity, Type> CompoentAdded;
 
         //[Obsolete("Garbage Collection intensive operation! Boxing of structure type components! Only for debugging purpose!!! Dont use this in operative System!")]
-        public event Action<Entity, Type> CompoentRemoved;
+        //public event Action<Entity, Type> CompoentRemoved;
 
         //[Obsolete("Garbage Collection intensive operation! Boxing of structure type components! Only for debugging purpose!!! Dont use this in operative System!")]
-        public event Action<Entity, Type> CompoentChanged;
-        
-        private List<Entity> _entityCreatedList = new List<Entity>();
-        private List<Entity> _entityDestroyedList = new List<Entity>();
-        private List<KeyValuePair<Entity, Type>> _compoentAddedList = new List<KeyValuePair<Entity, Type>>();
-        private List<KeyValuePair<Entity, Type>> _compoentRemovedList = new List<KeyValuePair<Entity, Type>>();
-        private List<KeyValuePair<Entity, Type>> _compoentChangedList = new List<KeyValuePair<Entity, Type>>();
+        //public event Action<Entity, Type> CompoentChanged;
 
-        public void ProcessMessageQueue() {
-            if (EntityCreated != null) {
-                for (int i = 0; i < _entityCreatedList.Count; i++) {
-                    EntityCreated.Invoke(_entityCreatedList[i]);
-                }
-            }
+        //private List<Entity> _entityCreatedList = new List<Entity>();
+        //private List<Entity> _entityDestroyedList = new List<Entity>();
+        //private List<KeyValuePair<Entity, Type>> _compoentAddedList = new List<KeyValuePair<Entity, Type>>();
+        //private List<KeyValuePair<Entity, Type>> _compoentRemovedList = new List<KeyValuePair<Entity, Type>>();
+        //private List<KeyValuePair<Entity, Type>> _compoentChangedList = new List<KeyValuePair<Entity, Type>>();
 
-            if (CompoentAdded != null) {
-                for (int i = 0; i < _compoentAddedList.Count; i++) {
-                    CompoentAdded.Invoke(_compoentAddedList[i].Key, _compoentAddedList[i].Value);
-                }
-            }
+        #region Events
+        private EntityAddedEvent _entityAddedEvent = new EntityAddedEvent();
+        private EntityRemovedEvent _entityRemovedEvent = new EntityRemovedEvent();
 
-            if (CompoentChanged != null) {
-                for (int i = 0; i < _compoentChangedList.Count; i++) {
-                    CompoentChanged.Invoke(_compoentChangedList[i].Key, _compoentChangedList[i].Value);
-                }
-            }
+        private ComponentAddedToEntityEvent _componentAddedToEntityEvent = new ComponentAddedToEntityEvent();
+        private ComponentRemovedFromEntityEvent _componentRemovedFromEntityEvent = new ComponentRemovedFromEntityEvent();
 
-            if (CompoentRemoved != null) {
-                for (int i = 0; i < _compoentRemovedList.Count; i++) {
-                    CompoentRemoved.Invoke(_compoentRemovedList[i].Key, _compoentRemovedList[i].Value);
-                }
-            }
 
-            if (EntityDestroyed != null) {
-                for (int i = 0; i < _entityDestroyedList.Count; i++) {
-                    EntityDestroyed.Invoke(_entityDestroyedList[i]);
-                }
-            }
-
-            for (int i = 0; i < _entityCreatedList.Count; i++) {
-                InspectComponentGroups(_entityCreatedList[i]);
-            }
-
-            for (int i = 0; i < _compoentAddedList.Count; i++) {
-                InspectComponentGroups(_compoentAddedList[i].Key);
-            }
-
-            for (int i = 0; i < _compoentRemovedList.Count; i++) {
-                InspectComponentGroups(_compoentRemovedList[i].Key);
-            }
-
-            for (int i = 0; i < _entityDestroyedList.Count; i++) {
-                InspectComponentGroups(_entityDestroyedList[i]);
-            }
-            _entityCreatedList.Clear();
-            _compoentAddedList.Clear();
-            _compoentChangedList.Clear();
-            _compoentRemovedList.Clear();
-            _entityDestroyedList.Clear();
+        public void SubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            _entityAddedEvent.Subscripe(eventListener);
         }
 
-        public Entity CreateEntity() {
+        public void UnsubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            _entityAddedEvent.Unsubscripe(eventListener);
+        }
+
+        public void SubscripeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
+            _entityRemovedEvent.Subscripe(ref entity, eventListener);
+        }
+
+        public void UnsubscripeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
+            _entityRemovedEvent.Unsubscripe(ref entity, eventListener);
+        }
+
+
+        public void SubscripeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
+            _componentAddedToEntityEvent.Subscripe(ref entity, eventListener);
+        }
+
+        public void UnsubscripeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
+            _componentAddedToEntityEvent.Unsubscripe(ref entity, eventListener);
+        }
+
+        public void SubscripeOnComponentRemovedFromEntity(Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
+            _componentRemovedFromEntityEvent.Subscripe(ref entity, eventListener);
+        }
+
+        public void UnsubscripeOnComponentRemovedFromEntity(Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
+            _componentRemovedFromEntityEvent.Unsubscripe(ref entity, eventListener);
+        }
+
+
+
+        public void SubscripeComponentChanged<TComponent>(Entity entity, IComponentChangedEventListener<TComponent> eventListener) where TComponent : IComponent {
+            Type componentType = typeof(TComponent);
+            ComponentArray componentArray;
+            if(_components.TryGetValue(componentType, out componentArray)) {
+                ((ComponentArray<TComponent>)componentArray).SubscripOnComponentChanged(entity, eventListener);
+            }
+        }
+
+        public void UnsubscripeComponentChanged<TComponent>(Entity entity, IComponentChangedEventListener<TComponent> eventListener) where TComponent : IComponent {
+            Type componentType = typeof(TComponent);
+            ComponentArray componentArray;
+            if (_components.TryGetValue(componentType, out componentArray)) {
+                ((ComponentArray<TComponent>)componentArray).UnsubscripOnComponentChanged(entity, eventListener);
+            }
+        }
+        
+        #endregion Events
+
+        
+        public virtual Entity CreateEntity() {
             Entity entity;
-            if (freeEntityIds.Count != 0) {
-                entity = new Entity(freeEntityIds.Pop());
+            if (_freeEntityIds.Count != 0) {
+                entity = new Entity(_freeEntityIds.Pop());
             } else {
-                entity = new Entity(nextEntityId);
-                nextEntityId++;
+                entity = new Entity(_nextEntityId);
+                _nextEntityId++;
             }
             _entityComponents.Add(entity, new HashSet<Type>());
             _entities.Add(entity);
-            _entityCreatedList.Add(entity);           
+            _entityAddedEvent.CallEvent(ref entity);
+            //_entityCreatedList.Add(entity);           
 
             return entity;
         }
 
-        public void DestroyEntity(Entity entity) {
+        public virtual void DestroyEntity(Entity entity) {
             foreach (Type componentType in _entityComponents[entity]) {
                 _components[componentType].Remove(entity);
-                _compoentRemovedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
+                //_compoentRemovedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
             }
             
             _entities.Remove(entity);
             _entityComponents.Remove(entity);
-            _entityDestroyedList.Add(entity);
-            freeEntityIds.Push(entity.Id);            
+            //_entityDestroyedList.Add(entity);
+            _freeEntityIds.Push(entity.Id);
+            _componentRemovedFromEntityEvent.RemoveEntityFromEvent(entity);
+            InspectComponentGroups(entity);
+            _entityAddedEvent.CallEvent(ref entity);
+
         }
 
         public void AddComponent<TComponent>(Entity entity, TComponent component) where TComponent : IComponent {
-            if(typeof(TComponent) == iComponentType) {
+            if(typeof(TComponent) == _iComponentType) {
                 throw new InvalidTComponentException();
             }
 
@@ -131,23 +145,26 @@ namespace ECS {
             entityComponentMap.Add(entity, component);
             var type = component.GetType();
             _entityComponents[entity].Add(componentType);
-            _compoentAddedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
+            InspectComponentGroups(entity);
+            _componentAddedToEntityEvent.CallEvent(ref entity, componentType);
+            //_compoentAddedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
+
         }
 
         public void SetComponent<TComponent>(Entity entity, TComponent component) where TComponent : struct, IComponent {
             Type componentType = typeof(TComponent);
-            if (componentType == iComponentType) {
+            if (componentType == _iComponentType) {
                 throw new InvalidTComponentException();
             }
             ComponentArray<TComponent> entityComponentMap = GetComponentMap<TComponent>(false);
             entityComponentMap.Update(entity, component);
-            _compoentChangedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
-            UpdateComponentGroups(entity, component);            
+            //_compoentChangedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
+            UpdateComponentGroups(ref entity, ref component);            
         }
 
 
         public void RemoveComponent<TComponent>(Entity entity, TComponent component) where TComponent : IComponent {
-            if (typeof(TComponent) == iComponentType) {
+            if (typeof(TComponent) == _iComponentType) {
                 throw new InvalidTComponentException();
             }
             Type componentType = typeof(TComponent);
@@ -155,8 +172,10 @@ namespace ECS {
             if (entityComponentMap != null) {
                 entityComponentMap.Remove(entity);
                 _entityComponents[entity].Remove(componentType);
+                InspectComponentGroups(entity);
+                _componentRemovedFromEntityEvent.CallEvent(ref entity, componentType);
             }
-            _compoentRemovedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
+            //_compoentRemovedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
         }
 
         public bool HasComponent(Entity entity, Type componentType) {
@@ -178,7 +197,7 @@ namespace ECS {
         }
 
         public TComponent GetComponent<TComponent>(Entity entity) where TComponent : IComponent {
-            if (typeof(TComponent) == iComponentType) {
+            if (typeof(TComponent) == _iComponentType) {
                 throw new InvalidTComponentException();
             }
             Type componentType = typeof(TComponent);
@@ -214,7 +233,8 @@ namespace ECS {
             if (!componentGroups.TryGetValue(groupMatcher, out componentGroup)) {
                 componentGroup = new ComponentGroup(this, componentTypes);
                 for (int i = 0; i < _entities.Count; i++) {
-                    componentGroup.Inspect(_entities[i]);
+                    Entity entity = _entities[i];
+                    componentGroup.Inspect(ref entity);
                 }
                 componentGroups.Add(groupMatcher, componentGroup);
             }
@@ -234,13 +254,13 @@ namespace ECS {
 
         private void InspectComponentGroups(Entity entity) {
             foreach (KeyValuePair<GroupMatcher, ComponentGroup> group in componentGroups) {
-                group.Value.Inspect(entity);
+                group.Value.Inspect(ref entity);
             }
         }
 
-        private void UpdateComponentGroups<TComponent>(Entity entity, TComponent component) where TComponent : struct, IComponent {
+        private void UpdateComponentGroups<TComponent>(ref Entity entity, ref TComponent component) where TComponent : struct, IComponent {
             foreach (KeyValuePair<GroupMatcher, ComponentGroup> group in componentGroups) {
-                group.Value.Update(entity, component);
+                group.Value.Update(ref entity,ref component);
             }
         }
 
@@ -256,4 +276,6 @@ namespace ECS {
             return obj.GetHashCode();
         }
     }
+
+
 }

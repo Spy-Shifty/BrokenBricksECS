@@ -21,23 +21,15 @@ namespace ECS {
 
         public List<EntityInfo> EntityList { get { return entityInfoList; } }
 
-        public UnityEntityManager() {
-            EntityCreated += UnityEntityManager_EntityCreated;
-            EntityDestroyed += UnityEntityManager_EntityDestroyed;
-            
-        }
-
-        private void UnityEntityManager_EntityCreated(Entity entity) {
+        public override Entity CreateEntity() {
+            Entity entity = base.CreateEntity();
             entityInfoList.Add(entity);
+            return entity;
         }
-
-        private void UnityEntityManager_EntityDestroyed(Entity entity) {
-            int index = entityInfoList.FindIndex(x => x.Equals(entity));
-            if (index != -1) {
-                entityInfoList.RemoveAt(index);
-            }
+        public override void DestroyEntity(Entity entity) {
+            base.DestroyEntity(entity);
+            entityInfoList.Remove(entity);
         }
-
     }
     
     public class EntityInfo : IEquatable<Entity> {

@@ -26,7 +26,7 @@ namespace ECS {
             base.Awake();
             Initialize();
             AddSceneEntitiesToSystem();
-            _entityManager.ProcessMessageQueue();
+            //_entityManager.ProcessMessageQueue();
 
 #if UNITY_EDITOR && ECS_DEBUG
             var gameObject = new GameObject("DebugEntityManager (" + _entityManager.GetType().Name + ")");

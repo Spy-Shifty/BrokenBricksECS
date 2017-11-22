@@ -53,19 +53,24 @@ public class ECSSetup : Editor {
             File.Delete(Path.Combine(destTempFolderPath, file + ".txt"));
         }
         EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation completed!\nPlease restart unity!", "ok");
+       
     }
+
 
     [MenuItem("BrokenBricks/ECS/Enable Visual Debuggin")]
     private static void EnableVisualDebugging() {
         foreach (BuildTargetGroup buildTarget in Enum.GetValues(typeof(BuildTargetGroup))) {
-            if(buildTarget == BuildTargetGroup.Unknown) {
+            if (buildTarget == BuildTargetGroup.Unknown) {
                 continue;
             }
             var scriptSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget).Split(';').Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (!scriptSymbols.Contains("ECS_DEBUG")) {
                 scriptSymbols.Add("ECS_DEBUG");
             }
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, string.Join(";", scriptSymbols.ToArray()));
+
+            try {
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, string.Join(";", scriptSymbols.ToArray()));
+            } catch { }
         }
     }
 
@@ -82,7 +87,9 @@ public class ECSSetup : Editor {
             }
             var scriptSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTarget).Split(';').Where(x => !string.IsNullOrEmpty(x)).ToList();
             scriptSymbols.Remove("ECS_DEBUG");
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, string.Join(";", scriptSymbols.ToArray()));
+            try {
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTarget, string.Join(";", scriptSymbols.ToArray()));
+            } catch { }
         }
     }
 

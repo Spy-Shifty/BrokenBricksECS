@@ -82,16 +82,14 @@ namespace ECS {
 
         public override void Start() {
             _rootDebugSystems.OnStart();
-            _entityManager.ProcessMessageQueue();
         }
+
         public override void Update() {
             _rootDebugSystems.OnUpdate();
-            _entityManager.ProcessMessageQueue();
         }
 
         public override void FixedUpdate() {
             _rootDebugSystems.OnFixedUpdate();
-            _entityManager.ProcessMessageQueue();
         }
     }
 #endif

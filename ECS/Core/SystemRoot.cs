@@ -91,20 +91,20 @@ namespace ECS {
             for (int i = 0; i < _startSystemList.Count; i++) {
                 _startSystemList[i].OnStart();
             }
-            _entityManager.ProcessMessageQueue();
+            //_entityManager.ProcessMessageQueue();
         }
         public virtual void Update() {
             for (int i = 0; i < _updateSystemList.Count; i++) {
                 _updateSystemList[i].OnUpdate();
             }
-            _entityManager.ProcessMessageQueue();
+            //_entityManager.ProcessMessageQueue();
         }
 
         public virtual void FixedUpdate() {
             for (int i = 0; i < _fixedUpdateSystemList.Count; i++) {
                 _fixedUpdateSystemList[i].OnFixedUpdate();
             }
-            _entityManager.ProcessMessageQueue();
+            //_entityManager.ProcessMessageQueue();
         }
     }
 }

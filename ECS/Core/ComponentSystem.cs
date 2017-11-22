@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace ECS {
-    public class ComponentSystem : IComponentSystemSetup {
+    public class ComponentSystem : IComponentSystemSetup, IEntityAddedEventListener, IEntityRemovedEventListener {
         public ComponentGroup group { get; private set; } 
         public virtual void OnEntityAdded(Entity entity) { }
         public virtual void OnEntityRemoved(Entity entity) { }
@@ -12,15 +12,19 @@ namespace ECS {
         void IComponentSystemSetup.AddGroup(ComponentGroup group) {
             this.group = group;
             if (group != null) {
-                group.OnEntityAdded += OnEntityAdded;
-                group.OnEntityRemoved += OnEntityRemoved;
+                group.SubscripeOnEntityAdded(this);
+                group.SubscripeOnEntityRemoved(this);
+                //group.OnEntityAdded += OnEntityAdded;
+                //group.OnEntityRemoved += OnEntityRemoved;
             }
         }
 
         void IComponentSystemSetup.RemoveGroup() {
-            group.OnEntityAdded -= OnEntityAdded;
-            group.OnEntityRemoved -= OnEntityRemoved;
-            this.group = null;
+            group.UnsubscripeOnEntityAdded(this);
+            group.UnsubscripeOnEntityAdded(this);
+            //group.OnEntityAdded -= OnEntityAdded;
+            //group.OnEntityRemoved -= OnEntityRemoved;
+            group = null;
         }
     }    
 

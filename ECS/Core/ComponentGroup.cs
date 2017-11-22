@@ -12,8 +12,26 @@ namespace ECS {
 
         private readonly EntityManager _entityManager;
 
-        public event Action<Entity> OnEntityAdded;
-        public event Action<Entity> OnEntityRemoved;
+        EntityAddedEvent entityAddedEvent = new EntityAddedEvent();
+        EntityRemovedEvent entityRemovedEvent = new EntityRemovedEvent();
+        //public event Action<Entity> OnEntityAdded;
+        //public event Action<Entity> OnEntityRemoved;
+
+        public void SubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            entityAddedEvent.Subscripe(eventListener);
+        }
+
+        public void UnsubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            entityAddedEvent.Unsubscripe(eventListener);
+        }
+
+        public void SubscripeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
+            entityRemovedEvent.Subscripe(eventListener);
+        }
+
+        public void UnsubscripeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
+            entityRemovedEvent.Unsubscripe(eventListener);
+        }
 
         public ComponentGroup(EntityManager entityManager, params Type[] componentTypes) {
             _entityManager = entityManager;
@@ -26,7 +44,7 @@ namespace ECS {
             }
         }
 
-        public void Inspect(Entity entity) {
+        internal void Inspect(ref Entity entity) {
             foreach (var groupType in _groupMatcher) {
                 if (!_entityManager.HasComponent(entity, groupType)) {
                     if (_components[groupType].Contains(entity)) {
@@ -38,7 +56,7 @@ namespace ECS {
             AddEntity(entity);
         }
 
-        public void Update<TComponent>(Entity entity, TComponent component) where TComponent : IComponent{
+        internal void Update<TComponent>(ref Entity entity,ref TComponent component) where TComponent : IComponent{
             Type componentType = typeof(TComponent);
             ComponentArray componentArray;
             if (_components.TryGetValue(componentType, out componentArray)) {
@@ -51,19 +69,14 @@ namespace ECS {
                 _components[groupType].Add(entity, _entityManager);
             }
 
-            if (OnEntityAdded != null) {
-                OnEntityAdded.Invoke(entity);
-            }
+            entityAddedEvent.CallEvent(ref entity);
         }
 
         private void RemoveEntity(Entity entity) {
             foreach (ComponentArray componentArray in _components.Values) {
                 componentArray.Remove(entity);
             }
-
-            if (OnEntityRemoved != null) {
-                OnEntityRemoved.Invoke(entity);
-            }
+            entityRemovedEvent.CallEvent(ref entity);
         }
 
         public ComponentArray<TComponent> GetComponent<TComponent>() where TComponent : IComponent {
@@ -124,137 +137,4 @@ namespace ECS {
             }
         }
     }
-
-    public abstract class ComponentArray {
-        public abstract bool Contains(Entity entity);
-        public abstract void Add(Entity entity, IComponent component);
-        public abstract void Remove(Entity entity);
-
-        public abstract void TryGetValue(Entity entity, out IComponent component);
-        public abstract void Add(Entity entity, EntityManager entityManager);
-    }
-
-    public sealed class ComponentArray<TComponent> : ComponentArray, /*IComponentArray,*/ IEnumerable<TComponent> where TComponent : IComponent {
-
-        private const int StartSize = 8;
-        private const int ResizeFactor = 2;
-        private readonly Dictionary<Entity, int> _componentsMap = new Dictionary<Entity, int>();
-
-
-        private Entity[] _entities = new Entity[StartSize];
-        private TComponent[] _components = new TComponent[StartSize];
-        private int size;
-
-        public Entity GetEntity(int index) {  return _entities[index];  }
-        public TComponent this[int index] {  get{ return _components[index]; }  }
-
-        public int Length { get { return size; } }
-
-        public override void Add(Entity entity, IComponent component) {
-            Add(entity, (TComponent)component);
-        }
-
-        public void Add(Entity entity, TComponent component) {
-            if (Contains(entity)) {
-                return;
-            }
-
-            if(_components.Length == size) {
-                var newEntityArray = new Entity[_entities.Length * ResizeFactor];
-                var newComponentArray = new TComponent[_components.Length * ResizeFactor];
-                Array.Copy(_entities, newEntityArray, size);
-                Array.Copy(_components, newComponentArray, size);
-                _entities = newEntityArray;
-                _components = newComponentArray;
-            }
-
-            _entities[size] = entity;
-            _components[size] = component;
-            _componentsMap.Add(entity, size);
-            size++;
-        }
-
-        public override void Remove(Entity entity) {
-            int index;
-            if (_componentsMap.TryGetValue(entity, out index)) {
-                int lastId = size-1;
-                _entities[index] = _entities[lastId];
-                _components[index] = _components[lastId];
-                _componentsMap[_entities[index]] = index;
-                _componentsMap.Remove(entity);
-                size--;
-
-                int shrinkSize = _components.Length / (2 * ResizeFactor);
-                if (size <= shrinkSize && shrinkSize > StartSize) {
-                    var newEntityArray = new Entity[_entities.Length / ResizeFactor];
-                    var newComponentArray = new TComponent[_components.Length / ResizeFactor];
-                    Array.Copy(_entities, newEntityArray, size);
-                    Array.Copy(_components, newComponentArray, size);
-                    _entities = newEntityArray;
-                    _components = newComponentArray;
-                }
-            }            
-        }
-
-        public override bool Contains(Entity entity) {
-            return _componentsMap.ContainsKey(entity);
-        }
-
-        public IEnumerator<TComponent> GetEnumerator() {
-            int index = 0;
-            while(index < size) {
-                yield return _components[index];
-                index++;
-            }
-        }
-
-        public void Update(Entity entity, TComponent component) {
-            int index;
-            if (_componentsMap.TryGetValue(entity, out index)) {
-                _components[index] = component;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() {
-            int index = 0;
-            while (index < size) {
-                yield return _components[index];
-                index++;
-            }
-        }
-
-        public override void TryGetValue(Entity entity, out IComponent component) {
-            int index;
-            if (_componentsMap.TryGetValue(entity, out index)) {
-                component = _components[index];
-            } else {
-                component = null;
-            }            
-        }
-
-        public override void Add(Entity entity, EntityManager entityManager) {
-            if (Contains(entity)) {
-                return;
-            }
-
-            
-            if (_components.Length == size) {
-                var newEntityArray = new Entity[_entities.Length * ResizeFactor];
-                var newComponentArray = new TComponent[_components.Length * ResizeFactor];
-                Array.Copy(_entities, newEntityArray, size);
-                Array.Copy(_components, newComponentArray, size);
-                _entities = newEntityArray;
-                _components = newComponentArray;
-            }
-
-            _entities[size] = entity;
-            _components[size] = entityManager.GetComponent<TComponent>(entity);
-            _componentsMap.Add(entity, size);
-            size++;
-        }
-
-        public TComponent GetComponent(Entity entity) {
-            return _components[_componentsMap[entity]];
-        }
-    }    
 }
