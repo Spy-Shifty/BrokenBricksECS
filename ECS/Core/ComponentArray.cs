@@ -86,7 +86,7 @@ namespace ECS {
             _components[_size] = component;
             _componentsMap.Add(entity, _size);
             _size++;
-            _entityAddedEvent.CallEvent(ref entity, ref component);
+            _entityAddedEvent.CallEvent(this, ref entity, ref component);
         }
 
         public override void Add(Entity entity, EntityManager entityManager) {
@@ -109,7 +109,7 @@ namespace ECS {
             _components[_size] = component;
             _componentsMap.Add(entity, _size);
             _size++;
-            _entityAddedEvent.CallEvent(ref entity, ref component);
+            _entityAddedEvent.CallEvent(this, ref entity, ref component);
         }
 
 
@@ -133,7 +133,7 @@ namespace ECS {
                     _entities = newEntityArray;
                     _components = newComponentArray;
                 }
-                _entityRemovedEvent.CallEvent(entity, component);
+                _entityRemovedEvent.CallEvent(this, entity, component);
             }
         }
 
@@ -142,7 +142,7 @@ namespace ECS {
             int index;
             if (_componentsMap.TryGetValue(entity, out index)) {
                 _components[index] = component;
-                _entityComponentChangedEvent.CallEvent(ref entity, ref component);
+                _entityComponentChangedEvent.CallEvent(this, ref entity, ref component);
             }
         }
 

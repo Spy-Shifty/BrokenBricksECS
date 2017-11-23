@@ -69,14 +69,14 @@ namespace ECS {
                 _components[groupType].Add(entity, _entityManager);
             }
 
-            entityAddedEvent.CallEvent(ref entity);
+            entityAddedEvent.CallEvent(this, ref entity);
         }
 
         private void RemoveEntity(Entity entity) {
             foreach (ComponentArray componentArray in _components.Values) {
                 componentArray.Remove(entity);
             }
-            entityRemovedEvent.CallEvent(ref entity);
+            entityRemovedEvent.CallEvent(this, ref entity);
         }
 
         public ComponentArray<TComponent> GetComponent<TComponent>() where TComponent : IComponent {

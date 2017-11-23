@@ -47,7 +47,7 @@ namespace ECS {
         }
 
 
-        public void OnEntityRemoved(Entity entity) {
+        public void OnEntityRemoved(object sender, Entity entity) {
             Destroy(this);
         }
 
@@ -80,7 +80,7 @@ namespace ECS {
             return _entityManager.GetComponent<TComponent>(_entity);
         }
         
-        public void OnComponentAddedToEntity(Entity entity, Type componentType) {
+        public void OnComponentAddedToEntity(object sender, Entity entity, Type componentType) {
             if (_componentWrapperMap.ContainsKey(componentType)) {
                 return;
             }
@@ -94,7 +94,7 @@ namespace ECS {
             }
         }
 
-        public void OnComponentRemovedFromEntity(Entity entity, Type componentType) {
+        public void OnComponentRemovedFromEntity(object sender, Entity entity, Type componentType) {
             ComponentWrapper componentWrapper;
             if (_componentWrapperMap.TryGetValue(componentType, out componentWrapper)) {
                 Destroy(componentWrapper);

@@ -17,9 +17,9 @@ namespace ECS {
 
         }
 
-        public void CallEvent(ref Entity entity) {
+        public void CallEvent(object sender, ref Entity entity) {
             for (int i = 0; i < eventListeners.Count; i++) {
-                eventListeners[i].OnEntityAdded(entity);
+                eventListeners[i].OnEntityAdded(sender, entity);
             }            
         }
     }
@@ -55,16 +55,16 @@ namespace ECS {
             eventListeners.Remove(eventListener);
         }
 
-        public void CallEvent(ref Entity entity) {
+        public void CallEvent(object sender, ref Entity entity) {
             List<IEntityRemovedEventListener> mapEventListeners;
             if (eventListenerMap.TryGetValue(entity, out mapEventListeners)) {
                 for (int i = 0; i < mapEventListeners.Count; i++) {
-                    mapEventListeners[i].OnEntityRemoved(entity);
+                    mapEventListeners[i].OnEntityRemoved(sender, entity);
                 }
             }
 
             for (int i = 0; i < eventListeners.Count; i++) {
-                eventListeners[i].OnEntityRemoved(entity);
+                eventListeners[i].OnEntityRemoved(sender, entity);
             }
         }
 
@@ -92,11 +92,11 @@ namespace ECS {
             }
         }
 
-        public void CallEvent(ref Entity entity, Type componentType) {
+        public void CallEvent(object sender, ref Entity entity, Type componentType) {
             List<IComponentAddedToEntityEventListener> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentAddedToEntity(entity, componentType);
+                    eventListeners[i].OnComponentAddedToEntity(sender, entity, componentType);
                 }
             }
         }
@@ -128,11 +128,11 @@ namespace ECS {
             }
         }
 
-        public void CallEvent(ref Entity entity, Type componentType) {
+        public void CallEvent(object sender, ref Entity entity, Type componentType) {
             List<IComponentRemovedFromEntityEventListener> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentRemovedFromEntity(entity, componentType);
+                    eventListeners[i].OnComponentRemovedFromEntity(sender, entity, componentType);
                 }
             }
         }
@@ -165,11 +165,11 @@ namespace ECS {
             }
         }
 
-        public void CallEvent(ref Entity entity, ref TComponent component) {
+        public void CallEvent(object sender, ref Entity entity, ref TComponent component) {
             List<IEntityAddedEventListener<TComponent>> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnEntityAdded(entity, component);
+                    eventListeners[i].OnEntityAdded(sender, entity, component);
                 }
             }
         }
@@ -197,11 +197,11 @@ namespace ECS {
             }
         }
 
-        public void CallEvent(Entity entity, TComponent component) {
+        public void CallEvent(object sender, Entity entity, TComponent component) {
             List<IEntityRemovedEventListener<TComponent>> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnEntityRemoved(entity, component);
+                    eventListeners[i].OnEntityRemoved(sender, entity, component);
                 }
             }
         }
@@ -230,11 +230,11 @@ namespace ECS {
             }
         }
 
-        public void CallEvent(ref Entity entity, ref TComponent component) {
+        public void CallEvent(object sender, ref Entity entity, ref TComponent component) {
             List<IComponentChangedEventListener<TComponent>> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentChanged(entity, component);
+                    eventListeners[i].OnComponentChanged(sender, entity, component);
                 }
             }
         }

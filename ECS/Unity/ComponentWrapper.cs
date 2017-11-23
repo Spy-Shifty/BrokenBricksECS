@@ -64,7 +64,7 @@ namespace ECS {
             }
         }
         
-        public void OnComponentChanged(Entity entity, TComponent component) {
+        public void OnComponentChanged(object sender, Entity entity, TComponent component) {
             _component = component;
         }
 
@@ -109,7 +109,7 @@ namespace ECS {
             }
         }
 
-        public void OnComponentChanged(Entity entity, TComponent component) {
+        public void OnComponentChanged(object sender, Entity entity, TComponent component) {
             _component = component;
         }
 

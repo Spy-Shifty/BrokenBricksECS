@@ -113,7 +113,7 @@ namespace ECS {
             }
             _entityComponents.Add(entity, new HashSet<Type>());
             _entities.Add(entity);
-            _entityAddedEvent.CallEvent(ref entity);
+            _entityAddedEvent.CallEvent(this, ref entity);
             //_entityCreatedList.Add(entity);           
 
             return entity;
@@ -131,7 +131,7 @@ namespace ECS {
             _freeEntityIds.Push(entity.Id);
             _componentRemovedFromEntityEvent.RemoveEntityFromEvent(entity);
             InspectComponentGroups(entity);
-            _entityAddedEvent.CallEvent(ref entity);
+            _entityAddedEvent.CallEvent(this, ref entity);
 
         }
 
@@ -146,7 +146,7 @@ namespace ECS {
             var type = component.GetType();
             _entityComponents[entity].Add(componentType);
             InspectComponentGroups(entity);
-            _componentAddedToEntityEvent.CallEvent(ref entity, componentType);
+            _componentAddedToEntityEvent.CallEvent(this, ref entity, componentType);
             //_compoentAddedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
 
         }
@@ -173,7 +173,7 @@ namespace ECS {
                 entityComponentMap.Remove(entity);
                 _entityComponents[entity].Remove(componentType);
                 InspectComponentGroups(entity);
-                _componentRemovedFromEntityEvent.CallEvent(ref entity, componentType);
+                _componentRemovedFromEntityEvent.CallEvent(this, ref entity, componentType);
             }
             //_compoentRemovedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
         }

@@ -29,16 +29,12 @@ namespace ECS {
             group = null;
         }
 
-        public virtual void OnEntityAdded(object sender, Entity entity) {
-            if (sender == group) {
-                OnEntityAdded(entity);
-            }
+        void IEntityAddedEventListener.OnEntityAdded(object sender, Entity entity) {
+            OnEntityAdded(entity);
         }
 
-        public virtual void OnEntityRemoved(object sender, Entity entity) {
-            if (sender == group) {
-                OnEntityRemoved(entity);
-            }
+        void IEntityRemovedEventListener.OnEntityRemoved(object sender, Entity entity) {
+            OnEntityRemoved(entity);
         }
     }    
 

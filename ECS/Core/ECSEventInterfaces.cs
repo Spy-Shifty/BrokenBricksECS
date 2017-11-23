@@ -7,35 +7,35 @@ using System.Text;
 namespace ECS {
 
     public interface IEntityAddedEventListener {
-        void OnEntityAdded(Entity entity);
+        void OnEntityAdded(object sender, Entity entity);
     }
 
     public interface IEntityRemovedEventListener {
-        void OnEntityRemoved(Entity entity);
+        void OnEntityRemoved(object sender, Entity entity);
     }
 
     public interface IComponentAddedToEntityEventListener {
-        void OnComponentAddedToEntity(Entity entity, Type componentType);
+        void OnComponentAddedToEntity(object sender, Entity entity, Type componentType);
     }
 
     public interface IComponentRemovedFromEntityEventListener {
-        void OnComponentRemovedFromEntity(Entity entity, Type componentType);
+        void OnComponentRemovedFromEntity(object sender, Entity entity, Type componentType);
     }
     
 
     public interface IEntityRemoveEventListener {
-        void OnEntityRemoved(Entity entity, Type componentType);
+        void OnEntityRemoved(object sender, Entity entity, Type componentType);
     }
 
     public interface IEntityAddedEventListener<TComponent> where TComponent : IComponent {
-        void OnEntityAdded(Entity entity, TComponent component);
+        void OnEntityAdded(object sender, Entity entity, TComponent component);
     }
 
     public interface IEntityRemovedEventListener<TComponent> where TComponent : IComponent {
-        void OnEntityRemoved(Entity entity, TComponent component);
+        void OnEntityRemoved(object sender, Entity entity, TComponent component);
     }
 
     public interface IComponentChangedEventListener<TComponent> where TComponent : IComponent {
-        void OnComponentChanged(Entity entity, TComponent component);
+        void OnComponentChanged(object sender, Entity entity, TComponent component);
     }
 }
