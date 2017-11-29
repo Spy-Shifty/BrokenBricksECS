@@ -7,11 +7,11 @@ namespace ECS {
 	// structs are way faster than class 
 	// use this when ever you can it has an importen impact on the computation speedup
 	[Serializable]
-	public struct #SCRIPTNAME# : IComponent {
+	public struct #SCRIPTNAME#Component : IComponent {
 
 	}	
 	
 	// this wrapps the component tfor Scene & Prefab workflow	
 	[DisallowMultipleComponent]
-	public class #SCRIPTNAME#Component : ComponentDataWrapper<#SCRIPTNAME#>{}	
+	public class #SCRIPTNAME# : ComponentDataWrapper<#SCRIPTNAME#Component>{}	
 }

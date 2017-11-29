@@ -8,11 +8,11 @@ namespace ECS {
 	// its not recommendet to use this because it has an importend impact no the computation speed
 	// use this class if you deal with unity Monobehaviour scripts like Transform
 	[Serializable]
-	public class #SCRIPTNAME# : IComponent, ICloneable {
+	public class #SCRIPTNAME#Component : IComponent, ICloneable {
 
 	}	
 	
 	// this wrapps the component tfor Scene & Prefab workflow	
 	[DisallowMultipleComponent]
-	public class #SCRIPTNAME#Component : ComponentWrapper<#SCRIPTNAME#>{}	
+	public class #SCRIPTNAME# : ComponentWrapper<#SCRIPTNAME#Component>{}	
 }

@@ -56,26 +56,30 @@ namespace ECS {
 
             Type injectTupleAttributeType = typeof(InjectTupleAttribute);
             Type iComponentArrayType = typeof(ComponentArray);
-            FieldInfo[]  allFields = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public).ToArray();
-            FieldInfo[] injectionTypeFields = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
+            FieldInfo[] allFields = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public).ToArray();
+            IGrouping<int, FieldInfo>[] injectionTypeGroups = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
                 .Where(field => field.GetCustomAttributes(injectTupleAttributeType, false).Any())
                 .Where(field => iComponentArrayType.IsAssignableFrom(field.FieldType))
+                .GroupBy(field => (field.GetCustomAttributes(injectTupleAttributeType, false).First() as InjectTupleAttribute).GroupId)
                 .ToArray();
 
 
-            Type[] injectionComponentTypes = injectionTypeFields
-                .Select(field => field.FieldType.GetGenericArguments()[0])
-                .ToArray();
+            foreach (IGrouping<int, FieldInfo> injectionTypeGroup in injectionTypeGroups) {
+                FieldInfo[] injectionTypeFields = injectionTypeGroup.ToArray();
+                Type[] injectionComponentTypes = injectionTypeGroup
+                    .Select(field => field.FieldType.GetGenericArguments()[0])
+                    .ToArray();
 
-            ComponentGroup group = _entityManager.GetComponentGroup(injectionComponentTypes);
+                ComponentGroup group = _entityManager.GetComponentGroup(injectionComponentTypes);
 
-            for (int i = 0; i < injectionComponentTypes.Length; i++) {
-                ComponentArray componentArray = group.GetComponent(injectionComponentTypes[i]);
-                injectionTypeFields[i].SetValue(system, componentArray);
+                for (int i = 0; i < injectionComponentTypes.Length; i++) {
+                    ComponentArray componentArray = group.GetComponent(injectionComponentTypes[i]);
+                    injectionTypeFields[i].SetValue(system, componentArray);
+                }
+
+                IComponentSystemSetup systemSetup = system;
+                systemSetup.AddGroup(group);
             }
-
-            IComponentSystemSetup systemSetup = system;
-            systemSetup.AddGroup(group);
         }
 
         public virtual void RemoveSystem(ComponentSystem system) {
@@ -84,7 +88,7 @@ namespace ECS {
             _fixedUpdateSystemList.Remove(system);
 
             IComponentSystemSetup systemSetup = system;
-            systemSetup.RemoveGroup();
+            systemSetup.RemoveAllGroups();
         }
 
         public virtual void Start() {

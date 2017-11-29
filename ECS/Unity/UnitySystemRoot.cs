@@ -77,7 +77,7 @@ namespace ECS {
             _rootDebugSystems.RemoveSystem(system);
             debugSystems.RemoveSystem(system);
             IComponentSystemSetup systemSetup = system;
-            systemSetup.RemoveGroup();
+            systemSetup.RemoveAllGroups();
         }
 
         public override void Start() {

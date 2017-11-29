@@ -20,7 +20,7 @@ namespace ECS {
         public void CallEvent(object sender, ref Entity entity) {
             for (int i = 0; i < eventListeners.Count; i++) {
                 eventListeners[i].OnEntityAdded(sender, entity);
-            }            
+            }
         }
     }
 
@@ -41,7 +41,7 @@ namespace ECS {
             List<IEntityRemovedEventListener> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 eventListeners.Remove(eventListener);
-                if(eventListeners.Count == 0) {
+                if (eventListeners.Count == 0) {
                     eventListenerMap.Remove(entity);
                 }
             }
@@ -145,7 +145,7 @@ namespace ECS {
 
     class EntityAddedEvent<TComponent> where TComponent : IComponent {
         private Dictionary<Entity, List<IEntityAddedEventListener<TComponent>>> eventListenerMap = new Dictionary<Entity, List<IEntityAddedEventListener<TComponent>>>();
-        
+
         public void Subscripe(ref Entity entity, IEntityAddedEventListener<TComponent> eventListener) {
             List<IEntityAddedEventListener<TComponent>> eventListeners;
             if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
