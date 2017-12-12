@@ -14,7 +14,7 @@ namespace ECS {
 		[InjectTuple]
 		ComponentArray<RotationSpeed> rotationSpeedArray;	
         [InjectTuple]
-		ComponentArray<ECSTransform> transformArray;
+		ComponentArray<TransformComponent> transformArray;
 
 
         // Use this for standard unity update function

@@ -18,9 +18,12 @@ namespace ECS {
 
     // this wrapps the component tfor Scene & Prefab workflow
     [HideInInspector]
-    public class ECSTransform : ComponentWrapper<TransformComponent> { 
-        public override void Initialize() {
+    public class ECSTransform : ComponentWrapper<TransformComponent> {
+        private void Awake() {
             TypedComponent.transform = gameObject.transform;
         }
+        //public override void Initialize() {
+        //    TypedComponent.transform = gameObject.transform;
+        //}
     }
 }

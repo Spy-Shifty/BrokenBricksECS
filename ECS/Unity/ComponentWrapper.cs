@@ -14,16 +14,16 @@ namespace ECS {
         /// <summary>
         /// Use this for Initializeation for example Unity Components like Transforms
         /// </summary>
-        public virtual void Initialize() { }
-        public abstract void SetEntityManager(Entity entity, EntityManager entityManager);
+        //public virtual void Initialize() { }
+        public abstract void Initialize(Entity entity, EntityManager entityManager);
         public abstract void SetComponentToEntityManager();
         //public abstract void GetComponentFromEntityManager();
     }
 
     [DisallowMultipleComponent]
-    public class ComponentWrapper<TComponent> : ComponentWrapper, IComponentChangedEventListener<TComponent> where TComponent : class, IComponent, ICloneable {
+    public class ComponentWrapper<TComponent> : ComponentWrapper, IComponentChangedEventListener<TComponent> where TComponent : class, IComponent, ICloneable, new() {
         [SerializeField]
-        private TComponent _component;
+        private TComponent _component = new TComponent();
         public TComponent TypedComponent { get { return _component; } }
 
         public override IComponent Component {
@@ -34,26 +34,36 @@ namespace ECS {
         public override Type ComponentType { get { return typeof(TComponent); } }
 
         public override void AddComponentToEntity(Entity entity, EntityManager entityManager) {
+            if (!enabled) {
+                return;
+            }
             entityManager.AddComponent(entity, (TComponent)_component.Clone());
         }
 
-        public override void SetComponentToEntityManager() {
-        }
+        public override void SetComponentToEntityManager() { }
+        
 
-        //public override void GetComponentFromEntityManager() {
-        //    _component = GetComponent<GameObjectEntity>().GetComponentFromEntityManager<TComponent>();
-        //}
-
-        public override void SetEntityManager(Entity entity, EntityManager entityManager) {
+        public override void Initialize(Entity entity, EntityManager entityManager) {            
             entityManager.SubscripeComponentChanged(entity, this);
-            _component = entityManager.GetComponent<TComponent>(entity);
+            if (!enabled) {
+                return;
+            }
+            if (entityManager.HasComponent<TComponent>(entity)) {
+                _component = entityManager.GetComponent<TComponent>(entity);
+            } else {
+                entityManager.AddComponent(entity, _component);
+            }
         }
 
         private void OnEnable() {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
             if (gameObjectEntity.IsInitialized) {
                 gameObjectEntity.EntityManager.SubscripeComponentChanged(gameObjectEntity.Entity, this);
-                _component = gameObjectEntity.GetComponentFromEntityManager<TComponent>();
+                if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
+                    _component = gameObjectEntity.GetComponentFromEntityManager<TComponent>();
+                } else {
+                    gameObjectEntity.EntityManager.AddComponent(gameObjectEntity.Entity, _component);
+                }
             }
         }
 
@@ -61,6 +71,10 @@ namespace ECS {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
             if (gameObjectEntity.IsInitialized) {
                 gameObjectEntity.EntityManager.UnsubscripeComponentChanged(gameObjectEntity.Entity, this);
+
+                if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
+                    gameObjectEntity.EntityManager.RemoveComponent(gameObjectEntity.Entity, _component);
+                }
             }
         }
         
@@ -83,22 +97,40 @@ namespace ECS {
         }
         public override Type ComponentType { get { return typeof(TComponent); } }
 
+        public override void Initialize(Entity entity, EntityManager entityManager) {
+            entityManager.SubscripeComponentChanged(entity, this);
+            if (entityManager.HasComponent<TComponent>(entity)) {
+                _component = entityManager.GetComponent<TComponent>(entity);
+            } else {
+                entityManager.AddComponent(entity, _component);
+            }
+        }
+
+
         public override void AddComponentToEntity(Entity entity, EntityManager entityManager) {
             entityManager.AddComponent(entity, _component);
+        }
+        
+        public void OnComponentChanged(object sender, Entity entity, TComponent component) {
+            _component = component;
         }
 
         public override void SetComponentToEntityManager() {
             GetComponent<GameObjectEntity>().SetComponentToEntityManager(_component);
         }
-        //public override void GetComponentFromEntityManager() {
-        //    _component = GetComponent<GameObjectEntity>().GetComponentFromEntityManager<TComponent>();
-        //}
-
         private void OnEnable() {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
+            if (enabled == false) {
+                return;
+            }
+
             if (gameObjectEntity.IsInitialized) {
                 gameObjectEntity.EntityManager.SubscripeComponentChanged(gameObjectEntity.Entity, this);
-                _component = gameObjectEntity.GetComponentFromEntityManager<TComponent>();
+                if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
+                    _component = gameObjectEntity.GetComponentFromEntityManager<TComponent>();
+                } else {
+                    gameObjectEntity.EntityManager.AddComponent(gameObjectEntity.Entity, _component);
+                }
             }
         }
 
@@ -106,17 +138,11 @@ namespace ECS {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
             if (gameObjectEntity.IsInitialized) {
                 gameObjectEntity.EntityManager.UnsubscripeComponentChanged(gameObjectEntity.Entity, this);
+
+                if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
+                    gameObjectEntity.EntityManager.RemoveComponent(gameObjectEntity.Entity, _component);
+                }
             }
-        }
-
-        public void OnComponentChanged(object sender, Entity entity, TComponent component) {
-            _component = component;
-        }
-
-        public override void SetEntityManager(Entity entity, EntityManager entityManager) {
-            entityManager.SubscripeComponentChanged(entity, this);
-            _component = entityManager.GetComponent<TComponent>(entity);
-
         }
     }
 }

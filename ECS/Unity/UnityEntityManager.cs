@@ -4,15 +4,121 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using UnityEngine;
 
 namespace ECS {
-#if !(UNITY_EDITOR && ECS_DEBUG)
-    [InjectableDependency(LifeTime.Singleton)]
-    public class UnityEntityManager : EntityManager {  }
+    public class InstantiateGameObjectException : Exception {
+        public InstantiateGameObjectException(string message) : base(message) {
+        }
+    }
 
-#else
+
     [InjectableDependency(LifeTime.Singleton)]
-    public class UnityEntityManager : EntityManager {
+    public partial class UnityEntityManager : EntityManager {
+        /// <summary>
+        /// Instantiates only Entities with there Components from Prefab! 
+        /// Wont Instantiate GameObject itself!
+        /// Use InstantiateWithGameObject instead.
+        /// </summary>
+        public void Instantiate(GameObject prefab, NativeArray<Entity> entityArray) {
+            var gameObjectEntity = prefab.GetComponent<GameObjectEntity>();
+            if (!gameObjectEntity) {
+                throw new Exception(prefab.name + " cant be instantiate without " + typeof(GameObjectEntity).Name + " component");
+            }
+
+            ComponentWrapper[] components = gameObjectEntity.GetComponents();
+
+            for (int i = 0; i < entityArray.Length; i++) {
+                entityArray[i] = CreateEntity();
+            }
+
+            for (int i = 0; i < components.Length; i++) {
+                for (int j = 0; j < entityArray.Length; j++) {
+                    components[i].AddComponentToEntity(entityArray[j], this);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Instantiates only Entity with it's Components from Prefab! 
+        /// Wont Instantiate GameObject itself!
+        /// Use InstantiateWithGameObject instead.
+        /// </summary>
+        public Entity Instantiate(GameObject prefab) {
+            var gameObjectEntity = prefab.GetComponent<GameObjectEntity>();
+            if (!gameObjectEntity) {
+                throw new Exception(prefab.name + " cant be instantiate without " + typeof(GameObjectEntity).Name + " component");
+            }
+            Entity entity = CreateEntity();
+            ComponentWrapper[] components = gameObjectEntity.GetComponents();
+            for (int i = 0; i < components.Length; i++) {
+                components[i].AddComponentToEntity(entity, this);
+            }
+            return entity;
+        }
+
+        /// <summary>
+        /// Instantiates Entity and GameObject with it's Components from Prefab!
+        /// </summary>
+        public GameObject InstantiateWithGameObject(GameObject prefab) {
+            Entity entity = CreateEntity();
+            GameObject gameObject = UnityEngine.Object.Instantiate(prefab);
+            gameObject.GetComponent<GameObjectEntity>().SetEntity(entity, this);
+            return gameObject;
+        }
+
+        /// <summary>
+        /// Instantiates Entity and GameObject with it's Components from Prefab!
+        /// </summary>
+        public GameObject InstantiateWithGameObject(GameObject prefab, Transform parent, bool instantiateInWorldSpace = false) {
+            Entity entity = CreateEntity();
+            GameObject gameObject = UnityEngine.Object.Instantiate(prefab, parent, instantiateInWorldSpace);
+            gameObject.GetComponent<GameObjectEntity>().SetEntity(entity, this);
+            return gameObject;
+        }
+
+        /// <summary>
+        /// Instantiates Entity and GameObject with it's Components from Prefab!
+        /// </summary>
+        public GameObject InstantiateWithGameObject(GameObject prefab, Vector3 position, Quaternion rotation) {
+            Entity entity = CreateEntity();
+            GameObject gameObject = UnityEngine.Object.Instantiate(prefab, position, rotation);
+            gameObject.GetComponent<GameObjectEntity>().SetEntity(entity, this);
+            return gameObject;
+        }
+
+        /// <summary>
+        /// Instantiates Entity and GameObject with it's Components from Prefab!
+        /// </summary>
+        public GameObject InstantiateWithGameObject(GameObject prefab, Vector3 position, Quaternion rotation, Transform parent) {
+            Entity entity = CreateEntity();
+            GameObject gameObject = UnityEngine.Object.Instantiate(prefab, position, rotation, parent);
+            gameObject.GetComponent<GameObjectEntity>().SetEntity(entity, this);
+            return gameObject;
+        }
+
+
+
+        /// <summary>
+        /// Instantiates only Entities with there Components from Prefab! 
+        /// Wont Instantiate GameObject itself!
+        /// Use InstantiateWithGameObject instead.
+        /// </summary>
+        public void InstantiateWithGameObject(GameObject prefab, NativeArray<Entity> entityArray, NativeArray<GameObject> gameObjectArray) {
+            if (gameObjectArray.Length != entityArray.Length) {
+                throw new InstantiateGameObjectException("entityArray and gameObjectArray must be the same size");
+            }
+
+            for (int i = 0; i < entityArray.Length; i++) {
+                entityArray[i] = CreateEntity();
+                gameObjectArray[i] = UnityEngine.Object.Instantiate(prefab);
+                gameObjectArray[i].GetComponent<GameObjectEntity>().SetEntity(entityArray[i], this);
+            }
+        }
+    }
+
+#if (UNITY_EDITOR && ECS_DEBUG)
+    public partial class UnityEntityManager : EntityManager {
 
         private List<EntityInfo> entityInfoList = new List<EntityInfo>();
 

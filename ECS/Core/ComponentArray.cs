@@ -12,6 +12,7 @@ namespace ECS {
 
         public abstract void TryGetValue(Entity entity, out IComponent component);
         public abstract void Add(Entity entity, EntityManager entityManager);
+        
 
     }
 
@@ -179,7 +180,6 @@ namespace ECS {
 
         public TComponent GetComponent(Entity entity) {
             return _components[_componentsMap[entity]];
-        }
-
+        }        
     }
 }

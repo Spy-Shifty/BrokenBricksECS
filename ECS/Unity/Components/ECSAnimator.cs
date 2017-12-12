@@ -19,8 +19,11 @@ namespace ECS {
     [HideInInspector]
     [RequireComponent(typeof(Animator))]
     public class ECSAnimator : ComponentWrapper<AnimatorComponent> {
-        public override void Initialize() {
+        private void Awake() {
             TypedComponent.animator = gameObject.GetComponent<Animator>();
         }
+        //public override void Initialize() {
+        //    TypedComponent.animator = gameObject.GetComponent<Animator>();
+        //}
     }
 }

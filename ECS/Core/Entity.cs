@@ -22,6 +22,14 @@ namespace ECS {
         public bool Equals(Entity other) {
             return id == other.id;
         }
+
+        public static bool operator ==(Entity a, Entity b) {
+            return a.id == b.id;
+        }
+
+        public static bool operator !=(Entity a, Entity b) {
+            return a.id != b.id;
+        }
     }
 
 }

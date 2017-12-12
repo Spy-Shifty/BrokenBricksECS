@@ -23,8 +23,8 @@ GameObject:
   - component: {fileID: 65566423840419788}
   - component: {fileID: 23227195287085776}
   - component: {fileID: 114350321044321832}
-  - component: {fileID: 114261996769998982}
   - component: {fileID: 114999402644054038}
+  - component: {fileID: 114261996769998982}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -122,6 +122,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b232900dba59184ba0639e8c51b155e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
+  onInitialized:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114999402644054038
 MonoBehaviour:
   m_ObjectHideFlags: 1

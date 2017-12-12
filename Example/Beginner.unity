@@ -361,22 +361,12 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'This Demo shows you how to setup the ECS+System
-
-
-    InitEntitiesSystem:
-
-    Creates 1000 entities with a FloatComponent
-
-
-    SumFloatSystem:
-
-    This system sums up the values of all FloatComponents
-
-
-    UpdateFloatSystem:
-
-    This system increment the value of all FloatComponents by 1'
+  m_Text: "This Demo shows you how to setup the ECS+System\n\nInitEntitiesSystem:\nCreates
+    1000 entities with a FloatComponent\n\nSumFloatSystem:\nThis system sums up the
+    values of all FloatComponents\n\nUpdateFloatSystem:\nThis system increment the
+    value of all FloatComponents by 1\n\nRun the scene...\nIn the hierarchy, take
+    a look at:\n\t- \"Systems\" to see all systems\n\t- \"Entities\" to inspekt all
+    created entities with there components"
 --- !u!222 &1748533615
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -465,7 +455,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1911052156}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 336, y: 190, z: 0}
+  m_LocalPosition: {x: 338, y: 189.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1748533613}

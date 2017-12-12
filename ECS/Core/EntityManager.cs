@@ -209,6 +209,19 @@ namespace ECS {
             throw new Exception("Entity doesn't have component " + componentType);
         }
 
+        public bool HasComponent<TComponent>(Entity entity) where TComponent : IComponent {
+            if (typeof(TComponent) == _iComponentType) {
+                throw new InvalidTComponentException();
+            }
+            Type componentType = typeof(TComponent);
+
+            ComponentArray componentEntityMap;
+            if (_components.TryGetValue(componentType, out componentEntityMap)) {
+                 return componentEntityMap.Contains(entity);
+            }
+            return false;
+        }
+
         public IEnumerable<IComponent> GetComponents(Entity entity) {
             IEnumerable<Type> componentTypes = _entityComponents[entity];
             List<IComponent> componentList = new List<IComponent>();
