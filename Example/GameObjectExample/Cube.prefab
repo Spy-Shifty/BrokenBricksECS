@@ -22,9 +22,9 @@ GameObject:
   - component: {fileID: 33830050831129264}
   - component: {fileID: 65566423840419788}
   - component: {fileID: 23227195287085776}
-  - component: {fileID: 114350321044321832}
-  - component: {fileID: 114999402644054038}
   - component: {fileID: 114261996769998982}
+  - component: {fileID: 114293842533361882}
+  - component: {fileID: 114005503778151882}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -98,6 +98,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114005503778151882
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1406706319012140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7b691edbe0fb84458ddd153cc94130d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  onInitialized:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &114261996769998982
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -111,7 +128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _component:
     speed: 10
---- !u!114 &114350321044321832
+--- !u!114 &114293842533361882
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -119,24 +136,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1406706319012140}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b232900dba59184ba0639e8c51b155e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 0
-  onInitialized:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
---- !u!114 &114999402644054038
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1406706319012140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7c861f7780329c4682673187dde54d2, type: 3}
+  m_Script: {fileID: 11500000, guid: 67f01f2e51059cc469491236036b7bc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _component:
