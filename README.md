@@ -1,6 +1,6 @@
 # BrokenBricksECS - Entity Component System for C# and Unity3D
 This ECS System is a rebuild of Unity3D upcoming Entity Component System.
-Special thanks to Joachim Ante from Unity3D and his hole team! They inspired me to rebuild there system.
+Special thanks to Joachim Ante from Unity3D and his whole team! They inspired me to rebuild there system.
 Because I could not wait to use it!
 
 ---
