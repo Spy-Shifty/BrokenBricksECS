@@ -31,10 +31,12 @@ public class ECSSetup : Editor {
 #if UNITY_EDITOR_WIN
             Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
             string unityInstallDir = (string)key.GetValue(unityRegistryValue);
-#elif UNITY_EDITOR_OSX
+#elif UNITY_EDITO_OSX
             string unityInstallDir = @"/Applications/Unity";
 #else
-            throw new NotImplementedException();            
+            string unityInstallDir =""
+            EditorUtility.DisplayDialog("ECS Installation", "Setup not supported for your OS!\n Please copy the template folder content manualy to:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
+            return;
 #endif
             string destTempFolderPath = unityInstallDir + unityTemplateDir;
 
@@ -64,7 +66,9 @@ public class ECSSetup : Editor {
 #elif UNITY_EDITOR_OSX
         string unityInstallDir = @"/Applications/Unity";
 #else
-        throw new NotImplementedException();            
+        string unityInstallDir =""
+        EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation not supported for your OS!\n Please delete the template folder content manualy from:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
+        return;           
 #endif
 
         string destTempFolderPath = unityInstallDir + unityTemplateDir;
