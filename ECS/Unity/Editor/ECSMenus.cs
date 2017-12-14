@@ -45,8 +45,14 @@ public class ECSSetup : Editor {
                 //var filePath = AssetDatabase.GetAssetPath();
             }
             EditorUtility.DisplayDialog("ECS Setup", "Installation completed!\nPlease restart unity to access all functionalities!", "ok");
-        } catch (Exception ex){
-            EditorUtility.DisplayDialog("ECS Setup", "Something went wrong!\n\n Error:\n" + ex.Message, "ok");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            EditorUtility.DisplayDialog("ECS Setup", "You need access privileges to the Unity install folder.\nStart Unity as Administrator and try again.", "ok");
+        }
+        catch (Exception ex)
+        {
+            EditorUtility.DisplayDialog("ECS Setup", "SSomething went wrong!\n\n Error:\n" + ex.Message, "ok");
         }
     }
 
@@ -63,11 +69,22 @@ public class ECSSetup : Editor {
 
         string destTempFolderPath = unityInstallDir + unityTemplateDir;
 
-        foreach (var file in files) {
-            File.Delete(Path.Combine(destTempFolderPath, file + ".txt"));
+        try
+        {
+            foreach (var file in files)
+            {
+                File.Delete(Path.Combine(destTempFolderPath, file + ".txt"));
+            }
+            EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation completed!\nPlease restart unity!", "ok");
         }
-        EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation completed!\nPlease restart unity!", "ok");
-       
+        catch (UnauthorizedAccessException)
+        {
+            EditorUtility.DisplayDialog("ECS Setup", "You need access privileges to the Unity install folder.\nStart Unity as Administrator and try again.", "ok");
+        }
+        catch (Exception ex)
+        {
+            EditorUtility.DisplayDialog("ECS Setup", "SSomething went wrong!\n\n Error:\n" + ex.Message, "ok");
+        }
     }
 
 
