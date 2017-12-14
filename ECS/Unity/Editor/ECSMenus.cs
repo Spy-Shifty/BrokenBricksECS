@@ -1,4 +1,3 @@
-﻿using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,8 +8,11 @@ using UnityEngine;
 
 public class ECSSetup : Editor {
     private const string unityTemplateDir = @"\Editor\Data\Resources\ScriptTemplates";
+
+#if UNITY_EDITOR_WIN
     private const string unityRegistryKey = @"Software\Unity Technologies\Installer\Unity\";
     private const string unityRegistryValue = @"Location x64";
+#endif
 
     static readonly string[] files = {
             "91-ECS__Wrapped Component Class-NewComponent.cs",
@@ -25,9 +27,15 @@ public class ECSSetup : Editor {
     [MenuItem("BrokenBricks/ECS/Setup")]
     private static void SetupECS() {
         try {
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
-            string unityInstallDir = (string)key.GetValue(unityRegistryValue);
 
+#if UNITY_EDITOR_WIN
+            Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
+            string unityInstallDir = (string)key.GetValue(unityRegistryValue);
+#elif UNITY_EDITOR_OSX
+            string unityInstallDir = @"/Applications/Unity";
+#else
+            throw new NotImplementedException();            
+#endif
             string destTempFolderPath = unityInstallDir + unityTemplateDir;
 
             foreach (var file in files) {
@@ -44,8 +52,14 @@ public class ECSSetup : Editor {
 
     [MenuItem("BrokenBricks/ECS/Uninstall")]
     private static void UninstallECS() {
-        RegistryKey key = Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
+#if UNITY_EDITOR_WIN
+        Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
         string unityInstallDir = (string)key.GetValue(unityRegistryValue);
+#elif UNITY_EDITOR_OSX
+        string unityInstallDir = @"/Applications/Unity";
+#else
+        throw new NotImplementedException();            
+#endif
 
         string destTempFolderPath = unityInstallDir + unityTemplateDir;
 
