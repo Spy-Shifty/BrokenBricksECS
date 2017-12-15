@@ -31,7 +31,7 @@ public class ECSSetup : Editor {
 #if UNITY_EDITOR_WIN
             Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
             string unityInstallDir = (string)key.GetValue(unityRegistryValue);
-#elif UNITY_EDITO_OSX
+#elif UNITY_EDITOR_OSX
             string unityInstallDir = @"/Applications/Unity";
 #else
             string unityInstallDir =""
