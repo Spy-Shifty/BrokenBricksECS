@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,5 +17,11 @@ namespace ECS {
 	
 	// this wrapps the component tfor Scene & Prefab workflow	
 	[DisallowMultipleComponent]
-	public class ECSColliders : ComponentWrapper<ColliderComponent>{}	
+	public class ECSColliders : ComponentWrapper<ColliderComponent>{
+        private void Awake() {
+            if(TypedComponent.collider.Length == 0) {
+                TypedComponent.collider = GetComponents<Collider>();
+            }
+        }
+    }	
 }
