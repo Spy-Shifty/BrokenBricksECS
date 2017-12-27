@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,18 +10,39 @@ using UnityEngine.Events;
 namespace ECS {
     public class GameObjectEntity : MonoBehaviour, IEntityRemovedEventListener, IComponentAddedToEntityEventListener, IComponentRemovedFromEntityEventListener {
         public int id;
+        public bool autoAddECSComponents = true;
 
         private Entity _entity;
-        private UnityEntityManager _entityManager;
+        private EntityManager _entityManager;
         private Dictionary<Type, ComponentWrapper> _componentWrapperMap = new Dictionary<Type, ComponentWrapper>();
 
         public bool IsInitialized { get; private set; }
         public Entity Entity { get { return _entity; } }
-        public UnityEntityManager EntityManager { get { return _entityManager; } }
+        public EntityManager EntityManager { get { return _entityManager; } }
 
         public UnityEvent onInitialized;
 
-        public void SetEntity(Entity entity, UnityEntityManager entityManager) {
+        void Awake() {
+            if (!autoAddECSComponents) {
+                return;
+            }
+
+            if (!gameObject.GetComponent<ECSTransform>()) {
+                gameObject.AddComponent<ECSTransform>();
+            }
+
+            if (gameObject.GetComponent<Rigidbody>() && !gameObject.GetComponent<ECSRigidbody>()) {
+                gameObject.AddComponent<ECSRigidbody>();
+            }
+            if (gameObject.GetComponent<Animator>() && !gameObject.GetComponent<ECSAnimator>()) {
+                gameObject.AddComponent<ECSAnimator>();
+            }
+            if (gameObject.GetComponent<Collider>() && !gameObject.GetComponent<ECSColliders>()) {
+                gameObject.AddComponent<ECSColliders>();
+            }
+        }
+
+        public void SetEntity(Entity entity, EntityManager entityManager) {
             if (IsInitialized) {
                 Debug.LogError(name + ": is already initialized by entity");
                 return;
@@ -42,9 +63,7 @@ namespace ECS {
                 //componentWrapper[i].Initialize();
             }
             IsInitialized = true;
-            if (onInitialized != null) {
-                onInitialized.Invoke();
-            }
+            onInitialized.Invoke();
         }
         
         public void OnEntityRemoved(object sender, Entity entity) {
