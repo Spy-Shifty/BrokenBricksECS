@@ -47,7 +47,6 @@ namespace ECS {
                 Debug.LogError(name + ": is already initialized by entity");
                 return;
             }
-            Debug.Log("SetEntity: " + gameObject.name);
 
             id = entity.Id;
             _componentWrapperMap.Clear();
