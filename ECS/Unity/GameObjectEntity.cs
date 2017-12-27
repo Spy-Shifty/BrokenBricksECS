@@ -21,9 +21,9 @@ namespace ECS {
         public EntityManager EntityManager { get { return _entityManager; } }
 
         public UnityEvent onInitialized;
-
-        void Awake() {
-            if (!autoAddECSComponents) {
+        
+        void AddECSComponents() {
+            if (!autoAddECSComponents || IsInitialized) {
                 return;
             }
 
@@ -47,6 +47,8 @@ namespace ECS {
                 Debug.LogError(name + ": is already initialized by entity");
                 return;
             }
+            Debug.Log("SetEntity: " + gameObject.name);
+
             id = entity.Id;
             _componentWrapperMap.Clear();
             _entity = entity;
@@ -56,6 +58,7 @@ namespace ECS {
             entityManager.SubscripeOnComponentAddedToEntity(entity, this);
             entityManager.SubscripeOnComponentRemovedFromEntity(entity, this);
 
+            AddECSComponents();
             ComponentWrapper[] componentWrapper = GetComponents();
             for (int i = 0; i < componentWrapper.Length; i++) {
                 _componentWrapperMap.Add(componentWrapper[i].ComponentType, componentWrapper[i]);
