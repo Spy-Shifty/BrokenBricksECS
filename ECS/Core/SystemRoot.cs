@@ -91,22 +91,26 @@ namespace ECS {
             systemSetup.RemoveAllGroups();
         }
 
+        protected virtual void OnError(Exception ex) {
+            Console.WriteLine(ex.Message);
+        }
+
         public virtual void Start() {
             for (int i = 0; i < _startSystemList.Count; i++) {
-                _startSystemList[i].OnStart();
+                try {  _startSystemList[i].OnStart(); } catch (Exception ex) { OnError(ex); }
             }
             //_entityManager.ProcessMessageQueue();
         }
         public virtual void Update() {
             for (int i = 0; i < _updateSystemList.Count; i++) {
-                _updateSystemList[i].OnUpdate();
+                try { _updateSystemList[i].OnUpdate(); } catch(Exception ex) { OnError(ex); }
             }
             //_entityManager.ProcessMessageQueue();
         }
 
         public virtual void FixedUpdate() {
             for (int i = 0; i < _fixedUpdateSystemList.Count; i++) {
-                _fixedUpdateSystemList[i].OnFixedUpdate();
+                try { _fixedUpdateSystemList[i].OnFixedUpdate(); } catch (Exception ex) { OnError(ex); }
             }
             //_entityManager.ProcessMessageQueue();
         }
