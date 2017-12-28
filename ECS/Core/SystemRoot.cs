@@ -57,14 +57,14 @@ namespace ECS {
             Type injectTupleAttributeType = typeof(InjectTupleAttribute);
             Type iComponentArrayType = typeof(ComponentArray);
             FieldInfo[] allFields = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public).ToArray();
-            IGrouping<int, FieldInfo>[] injectionTypeGroups = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
+            IGrouping<InjectTupleAttribute, FieldInfo>[] injectionTypeGroups = systemType.GetFieldsRecursive(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public)
                 .Where(field => field.GetCustomAttributes(injectTupleAttributeType, false).Any())
                 .Where(field => iComponentArrayType.IsAssignableFrom(field.FieldType))
-                .GroupBy(field => (field.GetCustomAttributes(injectTupleAttributeType, false).First() as InjectTupleAttribute).GroupId)
+                .GroupBy(field => (field.GetCustomAttributes(injectTupleAttributeType, false).First() as InjectTupleAttribute))
                 .ToArray();
 
 
-            foreach (IGrouping<int, FieldInfo> injectionTypeGroup in injectionTypeGroups) {
+            foreach (IGrouping<InjectTupleAttribute, FieldInfo> injectionTypeGroup in injectionTypeGroups) {
                 FieldInfo[] injectionTypeFields = injectionTypeGroup.ToArray();
                 Type[] injectionComponentTypes = injectionTypeGroup
                     .Select(field => field.FieldType.GetGenericArguments()[0])
@@ -78,7 +78,7 @@ namespace ECS {
                 }
 
                 IComponentSystemSetup systemSetup = system;
-                systemSetup.AddGroup(group);
+                systemSetup.AddGroup(group, injectionTypeGroup.Key.GroupName);
             }
         }
 

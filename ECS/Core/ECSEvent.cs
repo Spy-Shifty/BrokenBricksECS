@@ -4,6 +4,26 @@ using System.Linq;
 using System.Text;
 
 namespace ECS {
+    
+    public class ECSEvent<T> {
+        private List<Action<T>> eventListeners = new List<Action<T>>();
+
+        public void Subscripe(Action<T> eventListener) {
+            if (!eventListeners.Contains(eventListener)) {
+                eventListeners.Add(eventListener);
+            }
+        }
+
+        public void Unsubscripe(Action<T> eventListener) {
+            eventListeners.Remove(eventListener);
+        }
+
+        public void CallEvent(T eventArg) {
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].Invoke(eventArg);
+            }
+        }
+    }
 
     class EntityAddedEvent {
         private List<IEntityAddedEventListener> eventListeners = new List<IEntityAddedEventListener>();

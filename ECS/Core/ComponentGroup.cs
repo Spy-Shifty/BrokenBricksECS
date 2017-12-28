@@ -6,7 +6,6 @@ using System.Text;
 
 namespace ECS {
     public class ComponentGroup {
-
         private readonly GroupMatcher _groupMatcher;
         private readonly Dictionary<Type, ComponentArray> _components = new Dictionary<Type, ComponentArray>();
 
@@ -32,7 +31,7 @@ namespace ECS {
         public void UnsubscripeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
             entityRemovedEvent.Unsubscripe(eventListener);
         }
-
+        
         public ComponentGroup(EntityManager entityManager, params Type[] componentTypes) {
             _entityManager = entityManager;
             _groupMatcher = new GroupMatcher(componentTypes);
