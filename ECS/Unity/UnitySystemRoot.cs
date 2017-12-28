@@ -8,19 +8,20 @@ using ECS.VisualDebugging;
 #endif
 
 namespace ECS {
-
-#if !(UNITY_EDITOR && ECS_DEBUG)
+    
     [InjectableDependency(LifeTime.PerInstance)]
     public class UnityStandardSystemRoot : UnitySystemRoot<UnityEntityManager>  { }
 
-    public class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
+    public partial class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
+        protected override void OnError(Exception ex) {
+            Debug.LogError(ex.Message);
+        }
     }
-#else
-    [InjectableDependency(LifeTime.PerInstance)]
-    public class UnityStandardSystemRoot : UnitySystemRoot<UnityEntityManager> { }
+
+#if (UNITY_EDITOR && ECS_DEBUG)
 
     [InjectableDependency(LifeTime.PerInstance)]
-    public class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
+    public partial class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
         
         private readonly Dictionary<string, DebugSystems> _componentSystemList = new Dictionary<string, DebugSystems>();
 
