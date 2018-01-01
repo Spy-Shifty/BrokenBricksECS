@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 
 namespace ECS {
-    public class ComponentSystem : IComponentSystemSetup, IEntityAddedEventListener, IEntityRemovedEventListener {
+    public class ComponentSystem : IComponentSystemSetup, IEntityAddedEventListener, IEntityRemovedEventListener, IEntityRemovingEventListener {
         public IEnumerable<ComponentGroup> Groups { get { return groups.Keys; } }
 
         private readonly Dictionary<ComponentGroup, string> groups = new Dictionary<ComponentGroup,string>();
 
         public virtual void OnEntityAdded(string groupName, Entity entity) { }
+        public virtual void OnEntityRemoving(string groupName, Entity entity) { }
         public virtual void OnEntityRemoved(string groupName, Entity entity) { }
         public virtual void OnStart() { }
         public virtual void OnUpdate() { }
@@ -16,8 +17,9 @@ namespace ECS {
         void IComponentSystemSetup.AddGroup(ComponentGroup group, string groupName) {
             if (group != null) {
                 groups.Add(group, groupName);
-                group.SubscripeOnEntityAdded(this);
-                group.SubscripeOnEntityRemoved(this);
+                group.SubscribeOnEntityAdded(this);
+                group.SubscribeOnEntityRemoving(this);
+                group.SubscribeOnEntityRemoved(this);
                 //group.OnEntityAdded += OnEntityAdded;
                 //group.OnEntityRemoved += OnEntityRemoved;
             }
@@ -25,8 +27,9 @@ namespace ECS {
 
         void IComponentSystemSetup.RemoveGroup(ComponentGroup group) {
             if (group != null) {
-                group.UnsubscripeOnEntityAdded(this);
-                group.UnsubscripeOnEntityAdded(this);
+                group.UnsubscribeOnEntityAdded(this);
+                group.UnsubscribeOnEntityRemoving(this);
+                group.UnsubscribeOnEntityRemoved(this);
                 //group.OnEntityAdded -= OnEntityAdded;
                 //group.OnEntityRemoved -= OnEntityRemoved;      
                 groups.Remove(group);
@@ -36,8 +39,9 @@ namespace ECS {
 
         void IComponentSystemSetup.RemoveAllGroups() {
             foreach (var group in Groups) {
-                group.UnsubscripeOnEntityAdded(this);
-                group.UnsubscripeOnEntityAdded(this);
+                group.UnsubscribeOnEntityAdded(this);
+                group.UnsubscribeOnEntityRemoving(this);
+                group.UnsubscribeOnEntityRemoved(this);
             }
         }
 
@@ -52,6 +56,13 @@ namespace ECS {
             string groupName;
             if (groups.TryGetValue(sender as ComponentGroup, out groupName)) {
                 OnEntityRemoved(groupName, entity);
+            }
+        }
+
+        public void OnEntityRemoving(object sender, Entity entity) {
+            string groupName;
+            if (groups.TryGetValue(sender as ComponentGroup, out groupName)) {
+                OnEntityRemoving(groupName, entity);
             }
         }
     }    

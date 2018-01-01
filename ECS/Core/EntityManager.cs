@@ -23,6 +23,10 @@ namespace ECS {
         protected readonly Dictionary<Type, ComponentArray> _components = new Dictionary<Type, ComponentArray>(TypeComparer.typeComparer);
         protected readonly Dictionary<GroupMatcher, ComponentGroup> componentGroups = new Dictionary<GroupMatcher, ComponentGroup>();
 
+        internal void SubscribeOnEntityRemoved(Entity entity, GameObjectEntity gameObjectEntity) {
+            throw new NotImplementedException();
+        }
+
         //public event Action<Entity> EntityCreated;
         //public event Action<Entity> EntityDestroyed;
 
@@ -43,48 +47,66 @@ namespace ECS {
 
         #region Events
         private EntityAddedEvent _entityAddedEvent = new EntityAddedEvent();
+        private EntityRemovingEvent _entityRemovingEvent = new EntityRemovingEvent();
         private EntityRemovedEvent _entityRemovedEvent = new EntityRemovedEvent();
 
         private ComponentAddedToEntityEvent _componentAddedToEntityEvent = new ComponentAddedToEntityEvent();
+        private ComponentRemovingFromEntityEvent _componentRemovingFromEntityEvent = new ComponentRemovingFromEntityEvent();
         private ComponentRemovedFromEntityEvent _componentRemovedFromEntityEvent = new ComponentRemovedFromEntityEvent();
 
 
-        public void SubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
-            _entityAddedEvent.Subscripe(eventListener);
+        public void SubscribeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            _entityAddedEvent.Subscribe(eventListener);
         }
 
-        public void UnsubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
-            _entityAddedEvent.Unsubscripe(eventListener);
+        public void UnsubscribeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            _entityAddedEvent.Unsubscribe(eventListener);
         }
 
-        public void SubscripeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
-            _entityRemovedEvent.Subscripe(ref entity, eventListener);
+        public void SubscribeOnEntityRemoving(Entity entity, IEntityRemovingEventListener eventListener) {
+            _entityRemovingEvent.Subscribe(ref entity, eventListener);
         }
 
-        public void UnsubscripeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
-            _entityRemovedEvent.Unsubscripe(ref entity, eventListener);
+        public void UnsubscribeOnEntityRemoving(Entity entity, IEntityRemovingEventListener eventListener) {
+            _entityRemovingEvent.Unsubscribe(ref entity, eventListener);
         }
 
-
-        public void SubscripeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
-            _componentAddedToEntityEvent.Subscripe(ref entity, eventListener);
+        public void SubscribeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
+            _entityRemovedEvent.Subscribe(ref entity, eventListener);
         }
 
-        public void UnsubscripeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
-            _componentAddedToEntityEvent.Unsubscripe(ref entity, eventListener);
-        }
-
-        public void SubscripeOnComponentRemovedFromEntity(Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
-            _componentRemovedFromEntityEvent.Subscripe(ref entity, eventListener);
-        }
-
-        public void UnsubscripeOnComponentRemovedFromEntity(Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
-            _componentRemovedFromEntityEvent.Unsubscripe(ref entity, eventListener);
+        public void UnsubscribeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
+            _entityRemovedEvent.Unsubscribe(ref entity, eventListener);
         }
 
 
+        public void SubscribeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
+            _componentAddedToEntityEvent.Subscribe(ref entity, eventListener);
+        }
 
-        public void SubscripeComponentChanged<TComponent>(Entity entity, IComponentChangedEventListener<TComponent> eventListener) where TComponent : IComponent {
+        public void UnsubscribeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
+            _componentAddedToEntityEvent.Unsubscribe(ref entity, eventListener);
+        }
+
+        public void SubscribeOnComponentRemovingFromEntity(Entity entity, IComponentRemovingFromEntityEventListener eventListener) {
+            _componentRemovingFromEntityEvent.Subscribe(ref entity, eventListener);
+        }
+
+        public void UnsubscribeOnComponentRemovingFromEntity(Entity entity, IComponentRemovingFromEntityEventListener eventListener) {
+            _componentRemovingFromEntityEvent.Unsubscribe(ref entity, eventListener);
+        }
+
+        public void SubscribeOnComponentRemovedFromEntity(Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
+            _componentRemovedFromEntityEvent.Subscribe(ref entity, eventListener);
+        }
+
+        public void UnsubscribeOnComponentRemovedFromEntity(Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
+            _componentRemovedFromEntityEvent.Unsubscribe(ref entity, eventListener);
+        }
+
+
+
+        public void SubscribeComponentChanged<TComponent>(Entity entity, IComponentChangedEventListener<TComponent> eventListener) where TComponent : IComponent {
             Type componentType = typeof(TComponent);
             ComponentArray componentArray;
             if(_components.TryGetValue(componentType, out componentArray)) {
@@ -92,7 +114,7 @@ namespace ECS {
             }
         }
 
-        public void UnsubscripeComponentChanged<TComponent>(Entity entity, IComponentChangedEventListener<TComponent> eventListener) where TComponent : IComponent {
+        public void UnsubscribeComponentChanged<TComponent>(Entity entity, IComponentChangedEventListener<TComponent> eventListener) where TComponent : IComponent {
             Type componentType = typeof(TComponent);
             ComponentArray componentArray;
             if (_components.TryGetValue(componentType, out componentArray)) {
@@ -120,6 +142,7 @@ namespace ECS {
         }
 
         public virtual void DestroyEntity(Entity entity) {
+            _entityRemovingEvent.CallEvent(this, ref entity);
             foreach (Type componentType in _entityComponents[entity]) {
                 _components[componentType].Remove(entity);
                 //_compoentRemovedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
@@ -129,9 +152,10 @@ namespace ECS {
             _entityComponents.Remove(entity);
             //_entityDestroyedList.Add(entity);
             _freeEntityIds.Push(entity.Id);
+            _componentRemovingFromEntityEvent.RemoveEntityFromEvent(entity);
             _componentRemovedFromEntityEvent.RemoveEntityFromEvent(entity);
             InspectComponentGroups(entity);
-            _entityAddedEvent.CallEvent(this, ref entity);
+            _entityRemovedEvent.CallEvent(this, ref entity);
 
         }
 
@@ -170,6 +194,7 @@ namespace ECS {
             Type componentType = typeof(TComponent);
             ComponentArray<TComponent> entityComponentMap = GetComponentMap<TComponent>(false);
             if (entityComponentMap != null) {
+                _componentRemovingFromEntityEvent.CallEvent(this, ref entity, entityComponentMap.GetComponent(entity));
                 entityComponentMap.Remove(entity);
                 _entityComponents[entity].Remove(componentType);
                 InspectComponentGroups(entity);
@@ -207,6 +232,20 @@ namespace ECS {
                 return ((ComponentArray<TComponent>)componentEntityMap).GetComponent(entity);
             }
             throw new Exception("Entity doesn't have component " + componentType);
+        }
+
+        public bool TryGetComponent<TComponent>(Entity entity, out TComponent component) where TComponent : IComponent {
+            if (typeof(TComponent) == _iComponentType) {
+                throw new InvalidTComponentException();
+            }
+            Type componentType = typeof(TComponent);
+
+            ComponentArray componentEntityMap;
+            if (_components.TryGetValue(componentType, out componentEntityMap)) {
+                return ((ComponentArray<TComponent>)componentEntityMap).TryGetComponent(entity, out component);
+            }
+            component = default(TComponent);
+            return false;
         }
 
         public bool HasComponent<TComponent>(Entity entity) where TComponent : IComponent {

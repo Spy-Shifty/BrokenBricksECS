@@ -39,28 +39,28 @@ namespace ECS {
         private EntityRemovedEvent<TComponent> _entityRemovedEvent = new EntityRemovedEvent<TComponent>();
         private EntityComponentChangedEvent<TComponent> _entityComponentChangedEvent = new EntityComponentChangedEvent<TComponent>();
         public void SubscripOnEntityAdded(Entity entity, IEntityAddedEventListener<TComponent> eventListener) {
-            _entityAddedEvent.Subscripe(ref entity, eventListener);
+            _entityAddedEvent.Subscribe(ref entity, eventListener);
         }
 
         public void UnsubscripOnEntityAdded(Entity entity, IEntityAddedEventListener<TComponent> eventListener) {
-            _entityAddedEvent.Unsubscripe(ref entity, eventListener);
+            _entityAddedEvent.Unsubscribe(ref entity, eventListener);
         }
         
         public void SubscripOnEntityRemoved(Entity entity, IEntityRemovedEventListener<TComponent> eventListener) {
-            _entityRemovedEvent.Subscripe(ref entity, eventListener);
+            _entityRemovedEvent.Subscribe(ref entity, eventListener);
         }
 
         public void UnsubscripOnEntityRemoved(Entity entity, IEntityRemovedEventListener<TComponent> eventListener) {
-            _entityRemovedEvent.Unsubscripe(ref entity, eventListener);
+            _entityRemovedEvent.Unsubscribe(ref entity, eventListener);
         }
         
 
         public void SubscripOnComponentChanged(Entity entity, IComponentChangedEventListener<TComponent> eventListener) {
-            _entityComponentChangedEvent.Subscripe(ref entity, eventListener);
+            _entityComponentChangedEvent.Subscribe(ref entity, eventListener);
         }
 
         public void UnsubscripOnComponentChanged(Entity entity, IComponentChangedEventListener<TComponent> eventListener) {
-            _entityComponentChangedEvent.Unsubscripe(ref entity, eventListener);
+            _entityComponentChangedEvent.Unsubscribe(ref entity, eventListener);
         }
         
         #endregion Events
@@ -180,6 +180,16 @@ namespace ECS {
 
         public TComponent GetComponent(Entity entity) {
             return _components[_componentsMap[entity]];
-        }        
+        }    
+        
+        public bool TryGetComponent(Entity entity, out TComponent component) {
+            int index;
+            if(_componentsMap.TryGetValue(entity, out index)) {
+                component = _components[index];
+                return true;
+            }
+            component = default(TComponent);
+            return false;
+        }
     }
 }

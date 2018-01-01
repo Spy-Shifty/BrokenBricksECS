@@ -19,7 +19,7 @@ namespace ECS {
 	[DisallowMultipleComponent]
 	public class ECSColliders : ComponentWrapper<ColliderComponent>{
         private void Awake() {
-            if(TypedComponent.collider.Length == 0) {
+            if(TypedComponent.collider == null) {
                 TypedComponent.collider = GetComponents<Collider>();
             }
         }

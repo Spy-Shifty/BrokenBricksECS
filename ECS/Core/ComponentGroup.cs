@@ -12,24 +12,34 @@ namespace ECS {
         private readonly EntityManager _entityManager;
 
         EntityAddedEvent entityAddedEvent = new EntityAddedEvent();
+        EntityRemovingEvent entityRemovingEvent = new EntityRemovingEvent();
         EntityRemovedEvent entityRemovedEvent = new EntityRemovedEvent();
         //public event Action<Entity> OnEntityAdded;
         //public event Action<Entity> OnEntityRemoved;
 
-        public void SubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
-            entityAddedEvent.Subscripe(eventListener);
+        public void SubscribeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            entityAddedEvent.Subscribe(eventListener);
         }
 
-        public void UnsubscripeOnEntityAdded(IEntityAddedEventListener eventListener) {
-            entityAddedEvent.Unsubscripe(eventListener);
+        public void UnsubscribeOnEntityAdded(IEntityAddedEventListener eventListener) {
+            entityAddedEvent.Unsubscribe(eventListener);
         }
 
-        public void SubscripeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
-            entityRemovedEvent.Subscripe(eventListener);
+        public void SubscribeOnEntityRemoving(IEntityRemovingEventListener eventListener) {
+            entityRemovingEvent.Subscribe(eventListener);
         }
 
-        public void UnsubscripeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
-            entityRemovedEvent.Unsubscripe(eventListener);
+        public void UnsubscribeOnEntityRemoving(IEntityRemovingEventListener eventListener) {
+            entityRemovingEvent.Unsubscribe(eventListener);
+        }
+
+
+        public void SubscribeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
+            entityRemovedEvent.Subscribe(eventListener);
+        }
+
+        public void UnsubscribeOnEntityRemoved(IEntityRemovedEventListener eventListener) {
+            entityRemovedEvent.Unsubscribe(eventListener);
         }
         
         public ComponentGroup(EntityManager entityManager, params Type[] componentTypes) {
@@ -72,6 +82,7 @@ namespace ECS {
         }
 
         private void RemoveEntity(Entity entity) {
+            entityRemovingEvent.CallEvent(this, ref entity);
             foreach (ComponentArray componentArray in _components.Values) {
                 componentArray.Remove(entity);
             }

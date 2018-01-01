@@ -9,13 +9,19 @@ namespace ECS {
     public interface IEntityAddedEventListener {
         void OnEntityAdded(object sender, Entity entity);
     }
-
+    public interface IEntityRemovingEventListener {
+        void OnEntityRemoving(object sender, Entity entity);
+    }
     public interface IEntityRemovedEventListener {
         void OnEntityRemoved(object sender, Entity entity);
     }
 
     public interface IComponentAddedToEntityEventListener {
         void OnComponentAddedToEntity(object sender, Entity entity, Type componentType);
+    }
+
+    public interface IComponentRemovingFromEntityEventListener {
+        void OnComponentRemovingFromEntity<TComponent>(object sender, Entity entity, TComponent component);
     }
 
     public interface IComponentRemovedFromEntityEventListener {

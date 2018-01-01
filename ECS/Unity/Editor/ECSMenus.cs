@@ -32,7 +32,7 @@ public class ECSSetup : Editor {
             Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
             string unityInstallDir = (string)key.GetValue(unityRegistryValue);
 #elif UNITY_EDITOR_OSX
-            string unityInstallDir = @"/Applications/Unity";
+            string unityInstallDir = @"\Applications\Unity";
 #else
             string unityInstallDir =""
             EditorUtility.DisplayDialog("ECS Installation", "Setup not supported for your OS!\n Please copy the template folder content manualy to:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
@@ -64,7 +64,7 @@ public class ECSSetup : Editor {
         Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
         string unityInstallDir = (string)key.GetValue(unityRegistryValue);
 #elif UNITY_EDITOR_OSX
-        string unityInstallDir = @"/Applications/Unity";
+        string unityInstallDir = @"\Applications\Unity";
 #else
         string unityInstallDir =""
         EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation not supported for your OS!\n Please delete the template folder content manualy from:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           

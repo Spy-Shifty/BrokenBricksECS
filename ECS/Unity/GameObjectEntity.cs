@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -28,17 +28,22 @@ namespace ECS {
             }
 
             if (!gameObject.GetComponent<ECSTransform>()) {
-                gameObject.AddComponent<ECSTransform>();
+                var ecsTransform = gameObject.AddComponent<ECSTransform>();
+                ecsTransform.hideFlags = HideFlags.HideInInspector;
             }
 
             if (gameObject.GetComponent<Rigidbody>() && !gameObject.GetComponent<ECSRigidbody>()) {
-                gameObject.AddComponent<ECSRigidbody>();
+                var ecsRigidbody = gameObject.AddComponent<ECSRigidbody>();
+                ecsRigidbody.hideFlags = HideFlags.HideInInspector;
             }
             if (gameObject.GetComponent<Animator>() && !gameObject.GetComponent<ECSAnimator>()) {
-                gameObject.AddComponent<ECSAnimator>();
+                var ecsAnimator = gameObject.AddComponent<ECSAnimator>();
+                ecsAnimator.hideFlags = HideFlags.HideInInspector;
             }
             if (gameObject.GetComponent<Collider>() && !gameObject.GetComponent<ECSColliders>()) {
-                gameObject.AddComponent<ECSColliders>();
+                var ecsColliders = gameObject.AddComponent<ECSColliders>();
+                ecsColliders.hideFlags = HideFlags.HideInInspector;
+
             }
         }
 
@@ -53,9 +58,9 @@ namespace ECS {
             _entity = entity;
             _entityManager = entityManager;
 
-            entityManager.SubscripeOnEntityRemoved(_entity, this);
-            entityManager.SubscripeOnComponentAddedToEntity(entity, this);
-            entityManager.SubscripeOnComponentRemovedFromEntity(entity, this);
+            entityManager.SubscribeOnEntityRemoved(_entity, (IEntityRemovedEventListener)this);
+            entityManager.SubscribeOnComponentAddedToEntity(entity, this);
+            entityManager.SubscribeOnComponentRemovedFromEntity(entity, this);
 
             AddECSComponents();
             ComponentWrapper[] componentWrapper = GetComponents();
@@ -65,7 +70,9 @@ namespace ECS {
                 //componentWrapper[i].Initialize();
             }
             IsInitialized = true;
-            onInitialized.Invoke();
+            if (onInitialized != null) {
+                onInitialized.Invoke();
+            }
         }
         
         public void OnEntityRemoved(object sender, Entity entity) {

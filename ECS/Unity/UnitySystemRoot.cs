@@ -14,7 +14,7 @@ namespace ECS {
 
     public partial class UnitySystemRoot<TEntityManager> : SystemRoot<TEntityManager> where TEntityManager : UnityEntityManager {
         protected override void OnError(Exception ex) {
-            Debug.LogError(ex.Message);
+            Debug.LogError(ex.Message + "  " + ex.StackTrace);
         }
     }
 
