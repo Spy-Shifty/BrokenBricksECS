@@ -67,7 +67,6 @@ namespace ECS {
             for (int i = 0; i < componentWrapper.Length; i++) {
                 _componentWrapperMap.Add(componentWrapper[i].ComponentType, componentWrapper[i]);
                 componentWrapper[i].Initialize(entity, entityManager);
-                //componentWrapper[i].Initialize();
             }
             IsInitialized = true;
             if (onInitialized != null) {
@@ -106,6 +105,10 @@ namespace ECS {
         private void OnDestroy() {
             if (_entityManager != null) {
                 _entityManager.DestroyEntity(_entity);
+
+                _entityManager.UnsubscribeOnEntityRemoved(_entity, (IEntityRemovedEventListener)this);
+                _entityManager.UnsubscribeOnComponentAddedToEntity(_entity, this);
+                _entityManager.UnsubscribeOnComponentRemovedFromEntity(_entity, this);
             }
         }
 

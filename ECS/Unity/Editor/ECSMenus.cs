@@ -7,9 +7,9 @@ using UnityEditor;
 using UnityEngine;
 
 public class ECSSetup : Editor {
-    private const string unityTemplateDir = @"\Editor\Data\Resources\ScriptTemplates";
 
 #if UNITY_EDITOR_WIN
+    private const string unityTemplateDir = @"\Editor\Data\Resources\ScriptTemplates";
     private const string unityRegistryKey = @"Software\Unity Technologies\Installer\Unity\";
     private const string unityRegistryValue = @"Location x64";
 #endif
@@ -31,14 +31,14 @@ public class ECSSetup : Editor {
 #if UNITY_EDITOR_WIN
             Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
             string unityInstallDir = (string)key.GetValue(unityRegistryValue);
+            string destTempFolderPath = unityInstallDir + unityTemplateDir;
 #elif UNITY_EDITOR_OSX
-            string unityInstallDir = @"\Applications\Unity";
+            string destTempFolderPath = @"/Applications/Unity/Unity.app/Contents/Resources/ScriptTemplates";
 #else
-            string unityInstallDir =""
+            string destTempFolderPath =""
             EditorUtility.DisplayDialog("ECS Installation", "Setup not supported for your OS!\n Please copy the template folder content manualy to:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
             return;
 #endif
-            string destTempFolderPath = unityInstallDir + unityTemplateDir;
 
             foreach (var file in files) {
                 var assetGUID = AssetDatabase.FindAssets(file)[0];
