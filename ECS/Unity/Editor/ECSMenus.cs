@@ -20,7 +20,7 @@ public class ECSSetup : Editor {
             "91-ECS__Wrapped Component Struct-NewComponent.cs",
             "91-ECS__Component Struct-NewComponent.cs",
             "91-ECS__System-NewSystem.cs",
-            "91-ECS__SystemController-NewSystemController.cs",
+            "91-ECS__ECSController-NewECSController.cs",
         };
 
 

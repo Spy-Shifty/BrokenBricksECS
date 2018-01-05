@@ -5,13 +5,13 @@ namespace ECS {
     // Use this class instead of the UnityStandardSystemRoot to create decoupled systems
     // you also have to create a custom EntityManager, because of the Injectionmanager that handles all EntityManagers as singletons
     //[InjectableDependency(LifeTime.Singleton)]
-    //public class MyEntityManager : EntityManager { }
+    //public class MyEntityManager : UnityEntityManager { }
     //[InjectableDependency(LifeTime.PerInstance)]
     //class MySystemRoot : UnitySystemRoot<MyEntityManager> {}
 	
 	// Use this class to control the ECS System
 	// for different context replace ECSController<UnityStandardSystemRoot, EntityManager>  with your context classes
-	public class #SCRIPTNAME# : ECSController<UnityStandardSystemRoot, EntityManager> {
+	public class #SCRIPTNAME# : ECSController<UnityStandardSystemRoot, UnityEntityManager> {
 	
 		// Use this for initialization
 		protected override void Initialize() {

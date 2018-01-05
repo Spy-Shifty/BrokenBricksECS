@@ -189,7 +189,7 @@ namespace ECS {
         }
 
 
-        public void RemoveComponent<TComponent>(Entity entity, TComponent component) where TComponent : IComponent {
+        public void RemoveComponent<TComponent>(Entity entity) where TComponent : IComponent {
             if (typeof(TComponent) == _iComponentType) {
                 throw new InvalidTComponentException();
             }

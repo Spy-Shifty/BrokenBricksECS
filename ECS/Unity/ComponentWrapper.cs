@@ -73,7 +73,7 @@ namespace ECS {
                 gameObjectEntity.EntityManager.UnsubscribeComponentChanged(gameObjectEntity.Entity, this);
 
                 if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
-                    gameObjectEntity.EntityManager.RemoveComponent(gameObjectEntity.Entity, _component);
+                    gameObjectEntity.EntityManager.RemoveComponent<TComponent>(gameObjectEntity.Entity);
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace ECS {
         }
         private void OnEnable() {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
-            if (enabled == false) {
+            if (!enabled) {
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace ECS {
                 gameObjectEntity.EntityManager.UnsubscribeComponentChanged(gameObjectEntity.Entity, this);
 
                 if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
-                    gameObjectEntity.EntityManager.RemoveComponent(gameObjectEntity.Entity, _component);
+                    gameObjectEntity.EntityManager.RemoveComponent<TComponent>(gameObjectEntity.Entity);
                 }
             }
         }
