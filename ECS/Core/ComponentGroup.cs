@@ -74,19 +74,29 @@ namespace ECS {
         }
 
         private void AddEntity(Entity entity) {
+            bool added = false;
             foreach (var groupType in _groupMatcher) {
-                _components[groupType].Add(entity, _entityManager);
+                if(_components[groupType].Add(entity, _entityManager)) {
+                    added = true;
+                }
             }
-
-            entityAddedEvent.CallEvent(this, ref entity);
+            if (added) {
+                entityAddedEvent.CallEvent(this, ref entity);
+            }
         }
 
         private void RemoveEntity(Entity entity) {
             entityRemovingEvent.CallEvent(this, ref entity);
+            bool removed = false;
             foreach (ComponentArray componentArray in _components.Values) {
-                componentArray.Remove(entity);
+                if (componentArray.Remove(entity)) {
+                    removed = true;
+                }
             }
-            entityRemovedEvent.CallEvent(this, ref entity);
+            if (removed) {
+
+                entityRemovedEvent.CallEvent(this, ref entity);
+            }
         }
 
         public ComponentArray<TComponent> GetComponent<TComponent>() where TComponent : IComponent {

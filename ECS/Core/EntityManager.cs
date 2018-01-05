@@ -23,9 +23,6 @@ namespace ECS {
         protected readonly Dictionary<Type, ComponentArray> _components = new Dictionary<Type, ComponentArray>(TypeComparer.typeComparer);
         protected readonly Dictionary<GroupMatcher, ComponentGroup> componentGroups = new Dictionary<GroupMatcher, ComponentGroup>();
 
-        internal void SubscribeOnEntityRemoved(Entity entity, GameObjectEntity gameObjectEntity) {
-            throw new NotImplementedException();
-        }
 
         //public event Action<Entity> EntityCreated;
         //public event Action<Entity> EntityDestroyed;
@@ -77,8 +74,7 @@ namespace ECS {
 
         public void UnsubscribeOnEntityRemoved(Entity entity, IEntityRemovedEventListener eventListener) {
             _entityRemovedEvent.Unsubscribe(ref entity, eventListener);
-        }
-
+        }        
 
         public void SubscribeOnComponentAddedToEntity(Entity entity, IComponentAddedToEntityEventListener eventListener) {
             _componentAddedToEntityEvent.Subscribe(ref entity, eventListener);
@@ -142,6 +138,10 @@ namespace ECS {
         }
 
         public virtual void DestroyEntity(Entity entity) {
+            if (!_entities.Contains(entity)) {
+                return;
+            }
+
             _entityRemovingEvent.CallEvent(this, ref entity);
             foreach (Type componentType in _entityComponents[entity]) {
                 _components[componentType].Remove(entity);
@@ -160,18 +160,20 @@ namespace ECS {
         }
 
         public void AddComponent<TComponent>(Entity entity, TComponent component) where TComponent : IComponent {
+           
             if(typeof(TComponent) == _iComponentType) {
                 throw new InvalidTComponentException();
             }
 
             Type componentType = typeof(TComponent);
             ComponentArray<TComponent> entityComponentMap = GetComponentMap<TComponent>(true);
-            entityComponentMap.Add(entity, component);
-            var type = component.GetType();
-            _entityComponents[entity].Add(componentType);
-            InspectComponentGroups(entity);
-            _componentAddedToEntityEvent.CallEvent(this, ref entity, componentType);
-            //_compoentAddedList.Add(new KeyValuePair<Entity, Type>(entity, componentType));
+
+            if (entityComponentMap.Add(entity, component)) {
+                var type = component.GetType();
+                _entityComponents[entity].Add(componentType);
+                InspectComponentGroups(entity);
+                _componentAddedToEntityEvent.CallEvent(this, ref entity, componentType);
+            }
 
         }
 
@@ -193,7 +195,7 @@ namespace ECS {
             }
             Type componentType = typeof(TComponent);
             ComponentArray<TComponent> entityComponentMap = GetComponentMap<TComponent>(false);
-            if (entityComponentMap != null) {
+            if (entityComponentMap != null && entityComponentMap.Contains(entity)) {
                 _componentRemovingFromEntityEvent.CallEvent(this, ref entity, entityComponentMap.GetComponent(entity));
                 entityComponentMap.Remove(entity);
                 _entityComponents[entity].Remove(componentType);

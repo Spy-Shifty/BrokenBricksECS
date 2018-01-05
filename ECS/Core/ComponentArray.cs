@@ -7,11 +7,11 @@ using System.Text;
 namespace ECS {
     public abstract class ComponentArray {
         public abstract bool Contains(Entity entity);
-        public abstract void Add(Entity entity, IComponent component);
-        public abstract void Remove(Entity entity);
+        public abstract bool Add(Entity entity, IComponent component);
+        public abstract bool Remove(Entity entity);
 
         public abstract void TryGetValue(Entity entity, out IComponent component);
-        public abstract void Add(Entity entity, EntityManager entityManager);
+        public abstract bool Add(Entity entity, EntityManager entityManager);
         
 
     }
@@ -65,13 +65,13 @@ namespace ECS {
         
         #endregion Events
 
-        public override void Add(Entity entity, IComponent component) {
-            Add(entity, (TComponent)component);
+        public override bool Add(Entity entity, IComponent component) {
+            return Add(entity, (TComponent)component);
         }
 
-        public void Add(Entity entity, TComponent component) {
+        public bool Add(Entity entity, TComponent component) {
             if (Contains(entity)) {
-                return;
+                return false;
             }
 
             if (_components.Length == _size) {
@@ -88,11 +88,13 @@ namespace ECS {
             _componentsMap.Add(entity, _size);
             _size++;
             _entityAddedEvent.CallEvent(this, ref entity, ref component);
+
+            return true;
         }
 
-        public override void Add(Entity entity, EntityManager entityManager) {
+        public override bool Add(Entity entity, EntityManager entityManager) {
             if (Contains(entity)) {
-                return;
+                return false;
             }
 
 
@@ -111,10 +113,12 @@ namespace ECS {
             _componentsMap.Add(entity, _size);
             _size++;
             _entityAddedEvent.CallEvent(this, ref entity, ref component);
+
+            return true;
         }
 
 
-        public override void Remove(Entity entity) {
+        public override bool Remove(Entity entity) {
             int index;
             if (_componentsMap.TryGetValue(entity, out index)) {
                 int lastId = _size - 1;
@@ -135,7 +139,9 @@ namespace ECS {
                     _components = newComponentArray;
                 }
                 _entityRemovedEvent.CallEvent(this, entity, component);
+                return true;
             }
+            return false;
         }
 
 

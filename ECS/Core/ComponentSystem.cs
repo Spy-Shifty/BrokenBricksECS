@@ -45,21 +45,21 @@ namespace ECS {
             }
         }
 
-        public virtual void OnEntityAdded(object sender, Entity entity) {
+         void IEntityAddedEventListener.OnEntityAdded(object sender, Entity entity) {
             string groupName;
             if (groups.TryGetValue(sender as ComponentGroup, out groupName) ) {
                 OnEntityAdded(groupName, entity);
             }
         }
 
-        public virtual void OnEntityRemoved(object sender, Entity entity) {
+        void IEntityRemovedEventListener.OnEntityRemoved(object sender, Entity entity) {
             string groupName;
             if (groups.TryGetValue(sender as ComponentGroup, out groupName)) {
                 OnEntityRemoved(groupName, entity);
             }
         }
 
-        public void OnEntityRemoving(object sender, Entity entity) {
+        void IEntityRemovingEventListener.OnEntityRemoving(object sender, Entity entity) {
             string groupName;
             if (groups.TryGetValue(sender as ComponentGroup, out groupName)) {
                 OnEntityRemoving(groupName, entity);
