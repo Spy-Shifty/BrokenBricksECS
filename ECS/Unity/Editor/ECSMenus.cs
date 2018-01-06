@@ -63,18 +63,17 @@ public class ECSSetup : Editor {
 #if UNITY_EDITOR_WIN
         Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(unityRegistryKey, false);
         string unityInstallDir = (string)key.GetValue(unityRegistryValue);
+        string destTempFolderPath = unityInstallDir + unityTemplateDir;
 #elif UNITY_EDITOR_OSX
-        string unityInstallDir = @"\Applications\Unity";
+        string destTempFolderPath = @"/Applications/Unity/Unity.app/Contents/Resources/ScriptTemplates";
 #else
-        string unityInstallDir =""
+        string destTempFolderPath =""
         EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation not supported for your OS!\n Please delete the template folder content manualy from:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
         return;           
 #endif
 
-        string destTempFolderPath = unityInstallDir + unityTemplateDir;
 
-        try
-        {
+        try {
             foreach (var file in files)
             {
                 File.Delete(Path.Combine(destTempFolderPath, file + ".txt"));
