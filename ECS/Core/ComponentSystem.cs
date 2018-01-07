@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace ECS {
     public class ComponentSystem : IComponentSystemSetup, IEntityAddedEventListener, IEntityRemovedEventListener, IEntityRemovingEventListener {
+
+        public EntityManager EntityManager { get; private set; }
+
         public IEnumerable<ComponentGroup> Groups { get { return groups.Keys; } }
 
         private readonly Dictionary<ComponentGroup, string> groups = new Dictionary<ComponentGroup,string>();
@@ -13,6 +16,10 @@ namespace ECS {
         public virtual void OnStart() { }
         public virtual void OnUpdate() { }
         public virtual void OnFixedUpdate() { }
+
+        void IComponentSystemSetup.SetEntityManager(EntityManager entityManager) {
+            EntityManager = entityManager;
+        }
 
         void IComponentSystemSetup.AddGroup(ComponentGroup group, string groupName) {
             if (group != null) {
@@ -71,5 +78,6 @@ namespace ECS {
         void AddGroup(ComponentGroup group, string groupName);
         void RemoveGroup(ComponentGroup group);
         void RemoveAllGroups();
+        void SetEntityManager(EntityManager entityManager);
     }
 }
