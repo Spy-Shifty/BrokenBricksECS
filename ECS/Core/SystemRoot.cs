@@ -22,10 +22,7 @@ namespace ECS {
 
         public virtual void AddSystem<TComponentSystem>() where TComponentSystem : ComponentSystem {
             TComponentSystem componentSystem = InjectionManager.CreateObject<TComponentSystem>();
-
-            IComponentSystemSetup systemSetup = componentSystem;
-            systemSetup.SetEntityManager(_entityManager);
-
+            
             Type componentSystemType = componentSystem.GetType();
             if (componentSystemType.GetMethod("OnStart").DeclaringType == componentSystemType) {
                 _startSystemList.Add(componentSystem);
@@ -41,9 +38,6 @@ namespace ECS {
 
         public virtual void AddSystem(ComponentSystem componentSystem) {
             Type componentSystemType = componentSystem.GetType();
-
-            IComponentSystemSetup systemSetup = componentSystem;
-            systemSetup.SetEntityManager(_entityManager);
 
             if (componentSystemType.GetMethod("OnStart").DeclaringType == componentSystemType) {
                 _startSystemList.Add(componentSystem);
@@ -71,6 +65,7 @@ namespace ECS {
                 .ToArray();
 
 
+            IComponentSystemSetup systemSetup = system;
             foreach (IGrouping<InjectTupleAttribute, FieldInfo> injectionTypeGroup in injectionTypeGroups) {
                 FieldInfo[] injectionTypeFields = injectionTypeGroup.ToArray();
                 Type[] injectionComponentTypes = injectionTypeGroup
@@ -84,9 +79,9 @@ namespace ECS {
                     injectionTypeFields[i].SetValue(system, componentArray);
                 }
 
-                IComponentSystemSetup systemSetup = system;
                 systemSetup.AddGroup(group, injectionTypeGroup.Key.GroupName);
             }
+            systemSetup.SetEntityManager(_entityManager);
         }
 
         public virtual void RemoveSystem(ComponentSystem system) {
