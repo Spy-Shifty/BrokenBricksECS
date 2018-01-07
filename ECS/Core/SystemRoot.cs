@@ -80,8 +80,6 @@ namespace ECS {
                 }
 
                 systemSetup.AddGroup(group, injectionTypeGroup.Key.GroupName);
-                systemSetup.SetEntityManager(_entityManager);
-
             }
             systemSetup.SetEntityManager(_entityManager);
         }
