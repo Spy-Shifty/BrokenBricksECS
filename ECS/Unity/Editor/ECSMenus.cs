@@ -131,4 +131,5 @@ public class ECSSetup : Editor {
     private static bool ValidateDisableVisualDebugging() {
         return PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone).Contains("ECS_DEBUG");
     }
+    
 }

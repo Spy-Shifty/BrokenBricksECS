@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace ECS {
+    /// <summary>
+    /// This attribute will disable instantiating ComponentWrapper on relaese build
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class EditorOnlyAttribute : Attribute {  }
+
 
     [RequireComponent(typeof(GameObjectEntity))]
     public abstract class ComponentWrapper : MonoBehaviour {

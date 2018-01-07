@@ -174,7 +174,6 @@ namespace ECS {
                 InspectComponentGroups(entity);
                 _componentAddedToEntityEvent.CallEvent(this, ref entity, componentType);
             }
-
         }
 
         public void SetComponent<TComponent>(Entity entity, TComponent component) where TComponent : struct, IComponent {
