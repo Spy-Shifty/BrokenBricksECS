@@ -35,7 +35,7 @@ public class ECSSetup : Editor {
 #elif UNITY_EDITOR_OSX
             string destTempFolderPath = @"/Applications/Unity/Unity.app/Contents/Resources/ScriptTemplates";
 #else
-            string destTempFolderPath =""
+            string destTempFolderPath ="";
             EditorUtility.DisplayDialog("ECS Installation", "Setup not supported for your OS!\n Please copy the template folder content manualy to:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
             return;
 #endif
@@ -67,7 +67,7 @@ public class ECSSetup : Editor {
 #elif UNITY_EDITOR_OSX
         string destTempFolderPath = @"/Applications/Unity/Unity.app/Contents/Resources/ScriptTemplates";
 #else
-        string destTempFolderPath =""
+        string destTempFolderPath ="";
         EditorUtility.DisplayDialog("ECS Uninstallation", "Uninstallation not supported for your OS!\n Please delete the template folder content manualy from:\n"+ unityTemplateDir + "\n\n and restart unity!", "ok");           
         return;           
 #endif
