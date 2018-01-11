@@ -51,6 +51,11 @@ namespace ECS {
                 var ecsColliders = gameObject.AddComponent<ECSColliders>();
                 ecsColliders.hideFlags = HideFlags.HideInInspector;
             }
+
+            if (gameObject.GetComponent<CharacterController>() && !gameObject.GetComponent<ECSCharacterController>()) {
+                var ecsCharacterController = gameObject.AddComponent<ECSCharacterController>();
+                ecsCharacterController.hideFlags = HideFlags.HideInInspector;
+            }
         }
 
         public void SetEntity(Entity entity, EntityManager entityManager) {
