@@ -8,7 +8,7 @@ using System.Linq;
 using UnityEngine.Events;
 
 namespace ECS {
-    public class GameObjectEntity : MonoBehaviour, IEntityRemovedEventListener, IComponentAddedToEntityEventListener, IComponentRemovedFromEntityEventListener {
+    public class GameObjectEntity : ComponentWrapper<GameObjectEntityComponent>, IEntityRemovedEventListener, IComponentAddedToEntityEventListener, IComponentRemovedFromEntityEventListener {
 
         private static readonly Type editorOnlyAttributeType = typeof(EditorOnlyAttribute);
         
@@ -26,7 +26,12 @@ namespace ECS {
         public UnityEvent onInitialized;
 
         private Dictionary<Type, ComponentWrapper> componentsToDelete = new Dictionary<Type, ComponentWrapper>();
-        
+
+        private void Awake()
+        {
+            TypedComponent.gameObject = gameObject;
+        }
+
         void AddECSComponents() {
             if (!autoAddECSComponents || IsInitialized) {
                 return;
@@ -133,13 +138,10 @@ namespace ECS {
             }
         }
 
-
-
         public ComponentWrapper[] GetComponents() {
             ComponentWrapper[] componentWrapper = GetComponents<ComponentWrapper>();
             return componentWrapper;
         }
-                
         
         public void SetComponentToEntityManager<TComponent>(TComponent component) where TComponent : struct, IComponent {
             if (_entityManager != null) {
@@ -149,6 +151,18 @@ namespace ECS {
 
         public TComponent GetComponentFromEntityManager<TComponent>() where TComponent : IComponent {
             return _entityManager.GetComponent<TComponent>(_entity);
+        }
+    }
+
+    [Serializable]
+    public class GameObjectEntityComponent : IComponent, ICloneable
+    {
+        [HideInInspector]
+        public GameObject gameObject;
+
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
     }
 }
