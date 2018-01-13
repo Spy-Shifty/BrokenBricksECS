@@ -1,29 +1,29 @@
 # BrokenBricksECS - Entity Component System for C# and Unity3D
 This ECS System is a rebuild of Unity3D upcoming Entity Component System.
-Special thanks to Joachim Ante from Unity3D and his whole team! They inspired me to rebuild there system.
+Special thanks to Joachim Ante from Unity3D and his whole team! They inspired me to rebuild their system.
 Because I could not wait to use it!
 
 ---
 
-## Whats the unique thing to that System and why should you use BrokenBicksECS?
+## What's the unique thing to that System and why should you use BrokenBicksECS?
 * Huge speedup in relation to the (legacy) Unity System
 * Creating entities from Prefabs
-* Unity monobehaviour integration
+* Unity MonoBehaviour integration
 * Easy to maintain and to extend
 * System debugging like Entitas ECS
 * Inversion of control (dependency injection)
 * No Garbage Collecting
-* TupleInjection for multiple components in systems (only entities that matches all tuples)
+* Tuple Injection for multiple components in systems (only entities that matches all tuples)
 * Easy to use components, supports structs and classes
 * Easy to extend for multithreaded Systems (but not yet implemented)
 * Fast system and component creation through templates
 * Supports data prefetching (fetches data before it is needed)
-* Supports different contextes for entity (just by creating new classes of RootSystems and EntityManagers)
+* Supports different contexts for entity (just by creating new classes of RootSystems and EntityManagers)
 * No Object pooling required
 * and much more
 
 There is even more!
-BrokenBicksECS isn't made just for Unity. The Core Framework is pure c# code without any relation to Unity3d or any other system.
+BrokenBicksECS isn't made just for Unity. The Core Framework is pure C# code without any relation to Unity3d or any other system.
 The Unity part is just build on top of it!
 
 ---
@@ -35,12 +35,12 @@ The Unity part is just build on top of it!
 ---
 
 ## So what is ECS exactly:
-ECS stands for Entity Component System. Basicly you have entities. An Entity will be defined by its components, which hold the data. And this is importent! Components ONLY holding Data, no functions at all!
-The functionallity comes with the different systems, which will act on the data.
-And each system sould do only one thing. E.g. update Positions, handle Damages, and so on
+ECS stands for Entity Component System. Basically you have entities. An Entity will be defined by its components, which hold the data. And this is important! Components ONLY holding Data, no functions at all!
+The functionality comes from the different systems, which will act on the data.
+And each system should do only one thing. E.g. update Positions, handle Damages, and so on
 Systems always acts over all entities with the desired component on it (e.g. all Entities with the position component.)
 
-By the fact that systems handles the behaviour, you can just add a new system or remove one to add or remove a feature. The same for components. Your player character shouldn't be run anymore because of something happend in the game. Remove a isMoveable component from the player and catch it in the PlayerInputSystem. Done
+By the fact that systems handles the behaviour, you can just add a new system or remove one to add or remove a feature. The same for components. Your player character shouldn't move anymore because of something that happened in the game. Remove isMoveable component from the player and catch it in the PlayerInputSystem. Done.
 
 Something like that.
 
@@ -53,17 +53,17 @@ Something like that.
 namespace ECS {
  
     // Use this class to control the ECS System
-    public class GameController : ECSController<UnityStandardSystemRoot, EntityManager> {
+    public class GameController : ECSController<UnityStandardSystemRoot, UnityEntityManager> {
  
         // Use this for initialization
         protected override void Initialize() {
             AddSystem<MySystem>();
  
-            // or you can use this for more controll over compositions of systems
+            // or you can use this for more control over composition of systems
             //AddSystem(new MySystem());
         }
  
-        // Override this function if you want to controll what Scene Entity should be load in this context
+        // Override this function if you want to control what Scene Entity should be load in this context
         // The base implementation will add all Scene Entities to the context
         //protected override void AddSceneEntitiesToSystem() {
    
@@ -99,20 +99,17 @@ namespace ECSExample {
  
         private GameObject _gameObject;
  
-        [InjectDependency]
-        private EntityManager entityManager;
- 
         public override void OnStart() {
             _gameObject = new GameObject("Entities");
             for (int i = 0; i < 1000; i++) {
-                Entity entity = entityManager.CreateEntity();
+                Entity entity = EntityManager.CreateEntity();
  
                 GameObject gameObject = new GameObject("Entity-" + i);
                 gameObject.transform.SetParent(_gameObject.transform);
  
                 GameObjectEntity goEntity = gameObject.AddComponent<GameObjectEntity>();
-                goEntity.SetEntity(entity, entityManager);
-                entityManager.AddComponent(entity, new FloatComponent(1f));
+                goEntity.SetEntity(entity, EntityManager);
+                EntityManager.AddComponent(entity, new FloatComponent(1f));
             }
         }
     }
@@ -125,15 +122,12 @@ namespace ECSExample {
     [DebugSystemGroup("Update")]
     class UpdateFloatSystem : ComponentSystem {
  
-        [InjectDependency]
-        private EntityManager entityManager;
- 
         [InjectTuple]
         private ComponentArray<FloatComponent> floats;
         public override void OnUpdate() {
             float sum = 0;
             for (int i = 0; i < floats.Length; i++) {
-                entityManager.SetComponent(floats.GetEntity(i), new FloatComponent(floats[i].value + 1));
+                EntityManager.SetComponent(floats.GetEntity(i), new FloatComponent(floats[i].value + 1));
             }
         }
     }
@@ -142,12 +136,12 @@ namespace ECSExample {
 
 ### Accessing Components in Systems
 ```csharp
-/This class see only Enities with ComponentA and B attached to it
+//This class see only Enities with ComponentA and B attached to it
 class MySystem : ComponentSystem {
-    [InjectTuples]
+    [InjectTuple]
     ComponentArray<ComponentA> componentA;
  
-    [InjectTuples]
+    [InjectTuple]
     ComponentArray<ComponentB> componentB;
 }
  
@@ -172,7 +166,7 @@ class Spawner : Monobehaviour {
     public GameObject prefab;
  
     [InjectDependency]
-    EntityManager _entityManager;
+    UnityEntityManager _entityManager;
  
     void Awake() {
         InjectionManager.ResolveObject(this);
@@ -196,7 +190,7 @@ class Spawner : Monobehaviour {
         public GameObject _prefab;
  
         [InjectDependency]
-        private EntityManager _entityManager;
+        private UnityEntityManager _entityManager;
  
         // Use this for initialization
         void Start() {
@@ -205,7 +199,7 @@ class Spawner : Monobehaviour {
     }
 ```
 
-### Components that supports Unity Component
+### Components that support Unity Component
 ```csharp
     [Serializable]
     public class ECSTransform : IComponent, ICloneable {
@@ -234,7 +228,7 @@ class CarRootSystem :  UnityRootSystem<CarEntityManager>{}
  
 //context for Humans
 class HumanEntityManager : EntityManager{}
-class  HumanRootSystem :  UnityRootSystem< HumanEntityManager>{}
+class HumanRootSystem : UnityRootSystem<HumanEntityManager>{}
  
  
 //usage
@@ -243,38 +237,64 @@ class Controllers : Monobehaviour {
        HumanRootSystem humanSystem;
  
        void Awake() {
-            carSystem = new CarRootSystem ();
-            humanSystem= new HumanRootSystem  ();
+            carSystem = new CarRootSystem();
+            humanSystem = new HumanRootSystem();
  
-            ... add systems to the rootsystems
+            //... add systems to the rootsystems
       }
  
       void Start() {
-            carSystem .Start();
-            humanSystem .Start();
+            carSystem.Start();
+            humanSystem.Start();
      }
  
       void Update() {
-            carSystem .Update();
-            humanSystem .Update();
+            carSystem.Update();
+            humanSystem.Update();
      }
  
  
       void FixedUpdate() {
-            carSystem .FixedUpdate();
-            humanSystem .FixedUpdate();
+            carSystem.FixedUpdate();
+            humanSystem.FixedUpdate();
      }
 }
 ```
-This will enforce that you will separate enitities, components and systems
+This will enforce that you will separate entities, components and systems
 Systems of context Car only knows entities of that system and so on.
 If you want to communicate with the other Context use the EntityManager of that context
+
+### Event System
+Events called only for specific subscribers
+
+For example you can listen to component changed events for a specific component on a specific entity:
+
+```csharp
+
+public class MyClass : ComponentSystem, IComponentChangedEventListener<ComponentA>
+{
+    [InjectTuple]
+    ComponentArray<ComponentA> componentAArr;
+
+    public override void OnStart() {
+        for(int i=0; i < componentAArr.Length; i++){
+            EntityManager.SubscribeComponentChanged(componentAArr.GetEntity(i), this);
+        }
+    }
+
+    public void OnComponentChanged(object sender, Entity entity, ComponentA component) {
+        //...
+    }
+}
+```
+
+There are more events available, check out ComponentGroup, ComponentArray and EntityManager classes for more information.
 
 ### IOC:
 it works with any class you want.
 Just call InjectionManager.Resolve<myClass>() or if the object already exist use InjectionManager.ResolveDependency(my object)
 
-A injectable class should have the [InjectableDependency] Attribute on it
+An injectable class should have the [InjectableDependency] Attribute on it
 And to inject some object to your Fields and Props use [InjectDependency] Attribute
 The system will automatically recognize dependencies of constructors
 
@@ -313,7 +333,7 @@ just use ScriptBehaviour instead of Monobehaviour.
 public class SomeMonoBehaviourClass: ScriptBehaviour {
  
         [InjectDependency]
-        private EntityManager _entityManager;
+        private UnityEntityManager _entityManager;
  
 }
 ```
