@@ -50,8 +50,8 @@ namespace ECS {
             _eventHandler = eventHandler;
         }
 
-        public void OnComponentAddedToEntity(object sender, Entity entity, Type componentType) {
-            _eventHandler(entity, componentType);
+        public void OnComponentAddedToEntity<TComponent>(object sender, Entity entity, TComponent component) {
+            _eventHandler(entity, typeof(TComponent));
         }
     }
 
@@ -72,7 +72,7 @@ namespace ECS {
         }
     }
 
-    public class ComponentAddedToEntityEventListener<TComponent> : IEntityAddedEventListener<TComponent> where TComponent : IComponent {
+    public class ComponentAddedToEntityEventListener<TComponent> : IComponentAddedToEntityEventListener<TComponent> where TComponent : IComponent {
 
         public delegate void EventHandler(Entity entity, TComponent component);
         private EventHandler _eventHandler;
@@ -89,9 +89,9 @@ namespace ECS {
         }
     }
 
-    public class ComponentRemovedToEntityEventListener<TComponent> : IEntityRemovedEventListener<TComponent> where TComponent : IComponent {
+    public class ComponentRemovedToEntityEventListener<TComponent> : IComponentRemovedFromEntityEventListener<TComponent> where TComponent : IComponent {
 
-        public delegate void EventHandler(Entity entity, TComponent component);
+        public delegate void EventHandler(Entity entity);
         private EventHandler _eventHandler;
 
         public ComponentRemovedToEntityEventListener(EventHandler eventHandler) {
@@ -101,12 +101,12 @@ namespace ECS {
             _eventHandler = eventHandler;
         }
 
-        public void OnEntityRemoved(object sender, Entity entity, TComponent component) {
-            _eventHandler(entity, component);
+        public void OnEntityRemoved(object sender, Entity entity) {
+            _eventHandler(entity);
         }
     }
 
-    public class ComponentChangedToEntityEventListener<TComponent> : IComponentChangedEventListener<TComponent> where TComponent : IComponent {
+    public class ComponentChangedToEntityEventListener<TComponent> : IComponentChangedOfEntityEventListener<TComponent> where TComponent : IComponent {
 
         public delegate void EventHandler(Entity entity, TComponent component);
         private EventHandler _eventHandler;

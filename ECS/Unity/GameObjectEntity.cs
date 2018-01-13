@@ -86,7 +86,7 @@ namespace ECS {
         }
         
         public void OnEntityRemoved(object sender, Entity entity) {
-            Destroy(this);
+            Destroy(gameObject);
         }
         
         public void OnComponentAddedToEntity<TComponent>(object sender, Entity entity, TComponent component) {
