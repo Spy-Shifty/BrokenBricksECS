@@ -135,20 +135,24 @@ namespace ECS {
 
     }
 
-    class ComponentAddedToEntityEvent {
-        private Dictionary<Entity, List<IComponentAddedToEntityEventListener>> eventListenerMap = new Dictionary<Entity, List<IComponentAddedToEntityEventListener>>();
 
-        public void Subscribe(ref Entity entity, IComponentAddedToEntityEventListener eventListener) {
-            List<IComponentAddedToEntityEventListener> eventListeners;
+
+
+    public abstract class ECSComponentEvent<TComponentEventListener> {
+        protected Dictionary<Entity, List<TComponentEventListener>> eventListenerMap = new Dictionary<Entity, List<TComponentEventListener>>();
+        protected List<TComponentEventListener> eventListeners = new List<TComponentEventListener>();
+
+        public void Subscribe(ref Entity entity, TComponentEventListener eventListener) {
+            List<TComponentEventListener> eventListeners;
             if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners = new List<IComponentAddedToEntityEventListener>();
+                eventListeners = new List<TComponentEventListener>();
                 eventListenerMap.Add(entity, eventListeners);
             }
             eventListeners.Add(eventListener);
         }
 
-        public void Unsubscribe(ref Entity entity, IComponentAddedToEntityEventListener eventListener) {
-            List<IComponentAddedToEntityEventListener> eventListeners;
+        public void Unsubscribe(ref Entity entity, TComponentEventListener eventListener) {
+            List<TComponentEventListener> eventListeners;
             if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
                 eventListeners.Remove(eventListener);
                 if (eventListeners.Count == 0) {
@@ -157,183 +161,145 @@ namespace ECS {
             }
         }
 
-        public void CallEvent(object sender, ref Entity entity, Type componentType) {
-            List<IComponentAddedToEntityEventListener> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentAddedToEntity(sender, entity, componentType);
-                }
-            }
+        public void Subscribe(TComponentEventListener eventListener) {
+            eventListeners.Add(eventListener);
         }
 
+        public void Unsubscribe(TComponentEventListener eventListener) {
+            eventListeners.Remove(eventListener);
+        }
+        
         public void RemoveEntityFromEvent(ref Entity entity) {
             eventListenerMap.Remove(entity);
         }
+        
     }
 
-    class ComponentRemovingFromEntityEvent {
-        private Dictionary<Entity, List<IComponentRemovingFromEntityEventListener>> eventListenerMap = new Dictionary<Entity, List<IComponentRemovingFromEntityEventListener>>();
 
-        public void Subscribe(ref Entity entity, IComponentRemovingFromEntityEventListener eventListener) {
-            List<IComponentRemovingFromEntityEventListener> eventListeners;
-            if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners = new List<IComponentRemovingFromEntityEventListener>();
-                eventListenerMap.Add(entity, eventListeners);
+
+    public class ComponentAddedToEntityEvent : ECSComponentEvent<IComponentAddedToEntityEventListener> {
+        public void CallEvent<TComponent>(object sender, ref Entity entity, ref TComponent component) {
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnComponentAddedToEntity(sender, entity, component);
             }
-            eventListeners.Add(eventListener);
-        }
 
-        public void Unsubscribe(ref Entity entity, IComponentRemovingFromEntityEventListener eventListener) {
-            List<IComponentRemovingFromEntityEventListener> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners.Remove(eventListener);
-                if (eventListeners.Count == 0) {
-                    eventListenerMap.Remove(entity);
+            List<IComponentAddedToEntityEventListener> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnComponentAddedToEntity(sender, entity, component);
                 }
             }
-        }
-
-        public void CallEvent<TComponent>(object sender, ref Entity entity, TComponent component) {
-            List<IComponentRemovingFromEntityEventListener> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentRemovingFromEntity(sender, entity, component);
-                }
-            }
-        }
-
-        public void RemoveEntityFromEvent(Entity entity) {
-            eventListenerMap.Remove(entity);
         }
     }
-    class ComponentRemovedFromEntityEvent {
-        private Dictionary<Entity, List<IComponentRemovedFromEntityEventListener>> eventListenerMap = new Dictionary<Entity, List<IComponentRemovedFromEntityEventListener>>();
 
-        public void Subscribe(ref Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
-            List<IComponentRemovedFromEntityEventListener> eventListeners;
-            if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners = new List<IComponentRemovedFromEntityEventListener>();
-                eventListenerMap.Add(entity, eventListeners);
+    public class ComponentRemovingFromEntityEvent  : ECSComponentEvent<IComponentRemovingFromEntityEventListener> {
+        public void CallEvent<TComponent>(object sender, ref Entity entity, ref TComponent component) {
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnComponentRemovingFromEntity(sender, entity, component);
             }
-            eventListeners.Add(eventListener);
-        }
 
-        public void Unsubscribe(ref Entity entity, IComponentRemovedFromEntityEventListener eventListener) {
-            List<IComponentRemovedFromEntityEventListener> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners.Remove(eventListener);
-                if (eventListeners.Count == 0) {
-                    eventListenerMap.Remove(entity);
+            List<IComponentRemovingFromEntityEventListener> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnComponentRemovingFromEntity(sender, entity, component);
                 }
             }
         }
+    }
 
+    public class ComponentRemovedFromEntityEvent : ECSComponentEvent<IComponentRemovedFromEntityEventListener> {
         public void CallEvent(object sender, ref Entity entity, Type componentType) {
-            List<IComponentRemovedFromEntityEventListener> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentRemovedFromEntity(sender, entity, componentType);
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnComponentRemovedFromEntity(sender, entity, componentType);
+            }
+
+            List<IComponentRemovedFromEntityEventListener> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnComponentRemovedFromEntity(sender, entity, componentType);
                 }
             }
-        }
-
-        public void RemoveEntityFromEvent(Entity entity) {
-            eventListenerMap.Remove(entity);
         }
     }
 
-    class EntityAddedEvent<TComponent> where TComponent : IComponent {
-        private Dictionary<Entity, List<IEntityAddedEventListener<TComponent>>> eventListenerMap = new Dictionary<Entity, List<IEntityAddedEventListener<TComponent>>>();
-
-        public void Subscribe(ref Entity entity, IEntityAddedEventListener<TComponent> eventListener) {
-            List<IEntityAddedEventListener<TComponent>> eventListeners;
-            if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners = new List<IEntityAddedEventListener<TComponent>>();
-                eventListenerMap.Add(entity, eventListeners);
+    public class ComponentChangedOfEntityEvent : ECSComponentEvent<IComponentChangedOfEntityEventListener> {
+        public void CallEvent<TComponent>(object sender, ref Entity entity, ref TComponent component) {
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnComponentChangedOfEntity(sender, entity, component);
             }
-            eventListeners.Add(eventListener);
-        }
 
-        public void Unsubscribe(ref Entity entity, IEntityAddedEventListener<TComponent> eventListener) {
-            List<IEntityAddedEventListener<TComponent>> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners.Remove(eventListener);
-                if (eventListeners.Count == 0) {
-                    eventListenerMap.Remove(entity);
+            List<IComponentChangedOfEntityEventListener> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnComponentChangedOfEntity(sender, entity, component);
                 }
             }
         }
+    }
 
+
+
+
+
+
+
+
+
+    public class ComponentAddedToEntityEvent<TComponent>  : ECSComponentEvent<IComponentAddedToEntityEventListener<TComponent>> where TComponent : IComponent {
         public void CallEvent(object sender, ref Entity entity, ref TComponent component) {
-            List<IEntityAddedEventListener<TComponent>> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnEntityAdded(sender, entity, component);
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnEntityAdded(sender, entity, component);
+            }
+
+            List<IComponentAddedToEntityEventListener<TComponent>> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnEntityAdded(sender, entity, component);
                 }
             }
         }
     }
 
-    class EntityRemovedEvent<TComponent> where TComponent : IComponent {
-        private Dictionary<Entity, List<IEntityRemovedEventListener<TComponent>>> eventListenerMap = new Dictionary<Entity, List<IEntityRemovedEventListener<TComponent>>>();
-
-        public void Subscribe(ref Entity entity, IEntityRemovedEventListener<TComponent> eventListener) {
-            List<IEntityRemovedEventListener<TComponent>> eventListeners;
-            if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners = new List<IEntityRemovedEventListener<TComponent>>();
-                eventListenerMap.Add(entity, eventListeners);
-            }
-            eventListeners.Add(eventListener);
-        }
-
-        public void Unsubscribe(ref Entity entity, IEntityRemovedEventListener<TComponent> eventListener) {
-            List<IEntityRemovedEventListener<TComponent>> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners.Remove(eventListener);
-                if (eventListeners.Count == 0) {
-                    eventListenerMap.Remove(entity);
-                }
-            }
-        }
-
-        public void CallEvent(object sender, Entity entity, TComponent component) {
-            List<IEntityRemovedEventListener<TComponent>> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnEntityRemoved(sender, entity, component);
-                }
-            }
-        }
-    }
-
-
-    class EntityComponentChangedEvent<TComponent> where TComponent : IComponent {
-        private Dictionary<Entity, List<IComponentChangedEventListener<TComponent>>> eventListenerMap = new Dictionary<Entity, List<IComponentChangedEventListener<TComponent>>>();
-
-        public void Subscribe(ref Entity entity, IComponentChangedEventListener<TComponent> eventListener) {
-            List<IComponentChangedEventListener<TComponent>> eventListeners;
-            if (!eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners = new List<IComponentChangedEventListener<TComponent>>();
-                eventListenerMap.Add(entity, eventListeners);
-            }
-            eventListeners.Add(eventListener);
-        }
-
-        public void Unsubscribe(ref Entity entity, IComponentChangedEventListener<TComponent> eventListener) {
-            List<IComponentChangedEventListener<TComponent>> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                eventListeners.Remove(eventListener);
-                if (eventListeners.Count == 0) {
-                    eventListenerMap.Remove(entity);
-                }
-            }
-        }
-
+    public class ComponentRemovingFromEntityEvent<TComponent> : ECSComponentEvent<IComponentRemovingFromEntityEventListener<TComponent>> where TComponent : IComponent {
         public void CallEvent(object sender, ref Entity entity, ref TComponent component) {
-            List<IComponentChangedEventListener<TComponent>> eventListeners;
-            if (eventListenerMap.TryGetValue(entity, out eventListeners)) {
-                for (int i = 0; i < eventListeners.Count; i++) {
-                    eventListeners[i].OnComponentChanged(sender, entity, component);
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnEntityRemoved(sender, entity, component);
+            }
+
+            List<IComponentRemovingFromEntityEventListener<TComponent>> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnEntityRemoved(sender, entity, component);
+                }
+            }
+        }
+    }
+
+    public class ComponentRemovedFromEntityEvent<TComponent> : ECSComponentEvent<IComponentRemovedFromEntityEventListener<TComponent>> where TComponent : IComponent {
+        public void CallEvent(object sender, ref Entity entity) {
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnEntityRemoved(sender, entity);
+            }
+
+            List<IComponentRemovedFromEntityEventListener<TComponent>> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnEntityRemoved(sender, entity);
+                }
+            }
+        }
+    }
+
+    public class ComponentChangedOfEntityEvent<TComponent>: ECSComponentEvent<IComponentChangedOfEntityEventListener<TComponent>> where TComponent : IComponent {
+        public void CallEvent(object sender, ref Entity entity, ref TComponent component) {
+            for (int i = 0; i < eventListeners.Count; i++) {
+                eventListeners[i].OnComponentChanged(sender, entity, component);
+            }
+
+            List<IComponentChangedOfEntityEventListener<TComponent>> entityEventListeners;
+            if (eventListenerMap.TryGetValue(entity, out entityEventListeners)) {
+                for (int i = 0; i < entityEventListeners.Count; i++) {
+                    entityEventListeners[i].OnComponentChanged(sender, entity, component);
                 }
             }
         }

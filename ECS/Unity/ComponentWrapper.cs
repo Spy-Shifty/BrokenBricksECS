@@ -27,7 +27,7 @@ namespace ECS {
     }
 
     [DisallowMultipleComponent]
-    public class ComponentWrapper<TComponent> : ComponentWrapper, IComponentChangedEventListener<TComponent> where TComponent : class, IComponent, ICloneable, new() {
+    public class ComponentWrapper<TComponent> : ComponentWrapper, IComponentChangedOfEntityEventListener<TComponent> where TComponent : class, IComponent, ICloneable, new() {
         [SerializeField]
         private TComponent _component = new TComponent();
         public TComponent TypedComponent { get { return _component; } }
@@ -50,7 +50,7 @@ namespace ECS {
         
 
         public override void Initialize(Entity entity, EntityManager entityManager) {            
-            entityManager.SubscribeComponentChanged(entity, this);
+            entityManager.SubscribeOnComponentChangedOfEntity(entity, this);
             if (!enabled) {
                 return;
             }
@@ -64,7 +64,7 @@ namespace ECS {
         private void OnEnable() {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
             if (gameObjectEntity.IsInitialized) {
-                gameObjectEntity.EntityManager.SubscribeComponentChanged(gameObjectEntity.Entity, this);
+                gameObjectEntity.EntityManager.SubscribeOnComponentChangedOfEntity(gameObjectEntity.Entity, this);
                 if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
                     _component = gameObjectEntity.GetComponentFromEntityManager<TComponent>();
                 } else {
@@ -76,7 +76,7 @@ namespace ECS {
         private void OnDisable() {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
             if (gameObjectEntity.IsInitialized) {
-                gameObjectEntity.EntityManager.UnsubscribeComponentChanged(gameObjectEntity.Entity, this);
+                gameObjectEntity.EntityManager.UnsbscribeOnComponentChangedOfEntity(gameObjectEntity.Entity, this);
 
                 if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
                     gameObjectEntity.EntityManager.RemoveComponent<TComponent>(gameObjectEntity.Entity);
@@ -91,7 +91,7 @@ namespace ECS {
     }
 
     [DisallowMultipleComponent]
-    public class ComponentDataWrapper<TComponent> : ComponentWrapper, IComponentChangedEventListener<TComponent> where TComponent : struct, IComponent {
+    public class ComponentDataWrapper<TComponent> : ComponentWrapper, IComponentChangedOfEntityEventListener<TComponent> where TComponent : struct, IComponent {
         [SerializeField]
         private TComponent _component;
 
@@ -104,7 +104,7 @@ namespace ECS {
         public override Type ComponentType { get { return typeof(TComponent); } }
 
         public override void Initialize(Entity entity, EntityManager entityManager) {
-            entityManager.SubscribeComponentChanged(entity, this);
+            entityManager.SubscribeOnComponentChangedOfEntity(entity, this);
             if (entityManager.HasComponent<TComponent>(entity)) {
                 _component = entityManager.GetComponent<TComponent>(entity);
             } else {
@@ -131,7 +131,7 @@ namespace ECS {
             }
 
             if (gameObjectEntity.IsInitialized) {
-                gameObjectEntity.EntityManager.SubscribeComponentChanged(gameObjectEntity.Entity, this);
+                gameObjectEntity.EntityManager.SubscribeOnComponentChangedOfEntity(gameObjectEntity.Entity, this);
                 if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
                     _component = gameObjectEntity.GetComponentFromEntityManager<TComponent>();
                 } else {
@@ -143,7 +143,7 @@ namespace ECS {
         private void OnDisable() {
             GameObjectEntity gameObjectEntity = GetComponent<GameObjectEntity>();
             if (gameObjectEntity.IsInitialized) {
-                gameObjectEntity.EntityManager.UnsubscribeComponentChanged(gameObjectEntity.Entity, this);
+                gameObjectEntity.EntityManager.UnsbscribeOnComponentChangedOfEntity(gameObjectEntity.Entity, this);
 
                 if (gameObjectEntity.EntityManager.HasComponent<TComponent>(gameObjectEntity.Entity)) {
                     gameObjectEntity.EntityManager.RemoveComponent<TComponent>(gameObjectEntity.Entity);

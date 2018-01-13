@@ -13,11 +13,14 @@ namespace ECS {
         private static readonly IocContainer iocContainer = new IocContainer();
 
         static InjectionManager() {
-            Type[] typeArray = typeof(InjectionManager).Assembly.GetTypes();
-            for (int i = 0; i < typeArray.Length; i++) {
-                var injectableDependencyAttributes = (InjectableDependencyAttribute[])typeArray[i].GetCustomAttributes(typeof(InjectableDependencyAttribute), true);
-                if (injectableDependencyAttributes.Any()) {
-                    iocContainer.Register(typeArray[i], typeArray[i], injectableDependencyAttributes[0].Lifetime);
+            Assembly[] assemblyArray = AppDomain.CurrentDomain.GetAssemblies();
+            for (int i = 0; i < assemblyArray.Length; i++) {
+                Type[] typeArray = assemblyArray[i].GetTypes();
+                for (int j = 0; j < typeArray.Length; j++) {
+                    var injectableDependencyAttributes = (InjectableDependencyAttribute[])typeArray[j].GetCustomAttributes(typeof(InjectableDependencyAttribute), true);
+                    if (injectableDependencyAttributes.Any()) {
+                        iocContainer.Register(typeArray[j], typeArray[j], injectableDependencyAttributes[0].Lifetime);
+                    }
                 }
             }
         }

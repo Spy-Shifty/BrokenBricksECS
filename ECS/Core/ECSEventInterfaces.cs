@@ -16,8 +16,9 @@ namespace ECS {
         void OnEntityRemoved(object sender, Entity entity);
     }
 
+
     public interface IComponentAddedToEntityEventListener {
-        void OnComponentAddedToEntity(object sender, Entity entity, Type componentType);
+        void OnComponentAddedToEntity<TComponent>(object sender, Entity entity, TComponent component);
     }
 
     public interface IComponentRemovingFromEntityEventListener {
@@ -26,22 +27,26 @@ namespace ECS {
 
     public interface IComponentRemovedFromEntityEventListener {
         void OnComponentRemovedFromEntity(object sender, Entity entity, Type componentType);
-    }
-    
+    }    
 
-    public interface IEntityRemoveEventListener {
-        void OnEntityRemoved(object sender, Entity entity, Type componentType);
+    public interface IComponentChangedOfEntityEventListener {
+        void OnComponentChangedOfEntity<TComponent>(object sender, Entity entity, TComponent component);
     }
 
-    public interface IEntityAddedEventListener<TComponent> where TComponent : IComponent {
+
+
+    public interface IComponentAddedToEntityEventListener<TComponent> where TComponent : IComponent {
         void OnEntityAdded(object sender, Entity entity, TComponent component);
     }
 
-    public interface IEntityRemovedEventListener<TComponent> where TComponent : IComponent {
+    public interface IComponentRemovingFromEntityEventListener<TComponent> where TComponent : IComponent {
         void OnEntityRemoved(object sender, Entity entity, TComponent component);
     }
+    public interface IComponentRemovedFromEntityEventListener<TComponent> where TComponent : IComponent {
+        void OnEntityRemoved(object sender, Entity entity);
+    }
 
-    public interface IComponentChangedEventListener<TComponent> where TComponent : IComponent {
+    public interface IComponentChangedOfEntityEventListener<TComponent> where TComponent : IComponent {
         void OnComponentChanged(object sender, Entity entity, TComponent component);
     }
 }

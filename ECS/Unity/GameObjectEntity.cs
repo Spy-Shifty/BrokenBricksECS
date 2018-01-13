@@ -83,8 +83,9 @@ namespace ECS {
         public void OnEntityRemoved(object sender, Entity entity) {
             Destroy(this);
         }
-
-        public void OnComponentAddedToEntity(object sender, Entity entity, Type componentType) {
+        
+        public void OnComponentAddedToEntity<TComponent>(object sender, Entity entity, TComponent component) {
+            Type componentType = typeof(TComponent);
             if (_componentWrapperMap.ContainsKey(componentType)) {
                 if (componentsToDelete.ContainsKey(componentType)) {
                     componentsToDelete.Remove(componentType);

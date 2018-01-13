@@ -107,6 +107,7 @@ namespace ECS {
             for (int i = 0; i < _updateSystemList.Count; i++) {
                 try { _updateSystemList[i].OnUpdate(); } catch(Exception ex) { OnError(ex); }
             }
+            _entityManager.HandleDeletion();
             //_entityManager.ProcessMessageQueue();
         }
 
