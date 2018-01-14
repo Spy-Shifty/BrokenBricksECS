@@ -219,9 +219,9 @@ namespace ECS {
         public virtual Entity CreateEntity() {
             Entity entity;
             if (_freeEntityIds.Count != 0) {
-                entity = new Entity(_freeEntityIds.Pop());
+                entity = new Entity(_freeEntityIds.Pop(), this);
             } else {
-                entity = new Entity(_nextEntityId);
+                entity = new Entity(_nextEntityId, this);
                 _nextEntityId++;
             }
             _entityComponents.Add(entity, new HashSet<Type>());
