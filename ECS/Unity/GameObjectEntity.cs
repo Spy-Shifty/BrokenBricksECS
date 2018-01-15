@@ -101,12 +101,13 @@ namespace ECS {
             .Where(field => field.BaseType != null && field.BaseType.GetGenericArguments().Where(genericArgType => genericArgType == componentType).Any())
             .FirstOrDefault();
 
+           if (componentWrapperType != null) {
+               
 #if !UNITY_EDITOR
-           bool canBeAdded = !componentWrapperType.GetCustomAttributes(editorOnlyAttributeType, true).Any();
-#else
-           bool canBeAdded = true;
+               if(componentWrapperType.GetCustomAttributes(editorOnlyAttributeType, true).Any()){
+                   return;   
+               }
 #endif
-           if (componentWrapperType != null && canBeAdded) {
                ComponentWrapper componentWrapper = (ComponentWrapper)gameObject.AddComponent(componentWrapperType);
                _componentWrapperMap.Add(componentType, componentWrapper);
            }
