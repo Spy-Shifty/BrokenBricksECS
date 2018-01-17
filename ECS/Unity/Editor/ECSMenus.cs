@@ -86,7 +86,7 @@ public class ECSSetup : Editor {
             var unityDir = TemplatePath;
             if(!Directory.Exists(unityDir))
             {
-				EditorUtility.DisplayDialog("ECS Installation", "Setup not supported for your OS!\n Please copy the template folder content manually to:\n<UnityInstall>/" + unityTemplateDir + "\n\n and restart unity!", "ok");           
+                EditorUtility.DisplayDialog("ECS Installation", "Setup not supported for your OS!\n Please copy the template folder content manually to:\n<UnityInstall>/" + unityTemplateDir + "\n\n and restart unity!", "ok");           
                 return;
             }
 
@@ -133,7 +133,6 @@ public class ECSSetup : Editor {
             EditorUtility.DisplayDialog("ECS Setup", "SSomething went wrong!\n\n Error:\n" + ex.Message, "ok");
         }
     }
-
 
     [MenuItem("BrokenBricks/ECS/Enable Visual Debugging")]
     private static void EnableVisualDebugging() {
