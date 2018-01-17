@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using ECS;
+﻿using ECS;
 
 namespace ECSExample.GameObjectExample {
     public class Main : ECSController<UnityStandardSystemRoot, UnityEntityManager> {
