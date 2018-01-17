@@ -1,5 +1,4 @@
 ﻿using ECS;
-using ECS.VisualDebugging;
 using UnityEngine;
 
 namespace ECSExample.Beginner {
