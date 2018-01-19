@@ -17,6 +17,8 @@ namespace ECS {
 
         private Entity _entity;
         private EntityManager _entityManager;
+        
+        private Dictionary<Type, Type> cachedComponentWrapperType = new Dictionary<Type, Type>();
         private Dictionary<Type, ComponentWrapper> _componentWrapperMap = new Dictionary<Type, ComponentWrapper>();
 
         public bool IsInitialized { get; private set; }
@@ -97,9 +99,19 @@ namespace ECS {
                 }
                 return;
             }
-            Type componentWrapperType = componentType.Assembly.GetTypes()
-            .Where(field => field.BaseType != null && field.BaseType.GetGenericArguments().Where(genericArgType => genericArgType == componentType).Any())
-            .FirstOrDefault();
+            
+           Type componentWrapperType = null;
+           if (cachedComponentWrapperType.ContainsKey(componentType))
+           {
+               componentWrapperType = cachedComponentWrapperType[componentType];
+           }
+           else
+           {
+               componentWrapperType = componentType.Assembly.GetTypes()
+               .Where(field => field.BaseType != null && field.BaseType.GetGenericArguments().Where(genericArgType => genericArgType == componentType).Any())
+               .FirstOrDefault();
+                cachedComponentWrapperType.Add(componentType, componentWrapperType);
+           }
 
            if (componentWrapperType != null) {
                
