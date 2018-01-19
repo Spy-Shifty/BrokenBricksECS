@@ -43,7 +43,7 @@ namespace ECS.VisualDebugging {
                 var total = 0;
                 foreach (var system in _startSystems) {
                     var debugSystems = system as DebugSystems;
-                    total += debugSystems != null ? debugSystems.totalOnStartSystemsCount : _startSystemInfos.Count;
+                    total += debugSystems != null ? debugSystems.totalOnStartSystemsCount : 1;
                 }
                 return total;
             }
@@ -53,7 +53,7 @@ namespace ECS.VisualDebugging {
                 var total = 0;
                 foreach (var system in _updateSystems) {
                     var debugSystems = system as DebugSystems;
-                    total += debugSystems != null ? debugSystems.totalOnUpdateSystemsCount : _updateSystemInfos.Count;
+                    total += debugSystems != null ? debugSystems.totalOnUpdateSystemsCount : 1;
                 }
                 return total;
             }
@@ -63,7 +63,7 @@ namespace ECS.VisualDebugging {
                 var total = 0;
                 foreach (var system in _fixedUpdateSystems) {
                     var debugSystems = system as DebugSystems;
-                    total += debugSystems != null ? debugSystems.totalOnFixedUpdateSystemsCount : _fixedUpdateSystemInfos.Count;
+                    total += debugSystems != null ? debugSystems.totalOnFixedUpdateSystemsCount : 1;
                 }
                 return total;
             }
